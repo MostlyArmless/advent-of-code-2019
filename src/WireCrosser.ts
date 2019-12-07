@@ -9,7 +9,7 @@ type WireLengthAtCollisionPoint = number;
 export class WireCrosser
 {
     wirePaths: Wirepath[];
-    occupiedPoints: Map<CoordStr, Set<WireIndex>>;
+    occupiedPoints: Map<CoordStr, Map<WireIndex, WireLengthAtCollisionPoint>>;
     collisionPoints: Map<CoordStr, Map<WireIndex, WireLengthAtCollisionPoint>>;
     positiveDirections: Set<string>;
     leftRightDirections: Set<string>;
@@ -18,7 +18,7 @@ export class WireCrosser
     constructor( wirePaths: WirePathStr[], enableLogging?: boolean )
     {
         this.wirePaths = wirePaths.map( pathStr => { return pathStr.split( ',' ); } );
-        this.occupiedPoints = new Map<CoordStr, Set<WireIndex>>();
+        this.occupiedPoints = new Map<CoordStr, Map<WireIndex, WireLengthAtCollisionPoint>>();
         this.collisionPoints = new Map<CoordStr, Map<WireIndex, WireLengthAtCollisionPoint>>();
         this.positiveDirections = new Set<string>( ['U', 'R'] );
         this.leftRightDirections = new Set<string>( ['L', 'R'] );
@@ -54,7 +54,36 @@ export class WireCrosser
 
     minimizeSignalDelay()
     {
+        this.AddAllWires();
 
+        let bestCoords = '0,0';
+        let bestCombinedLength = Number.MAX_SAFE_INTEGER;
+
+        for ( const intersection of this.collisionPoints )
+        {
+            let { combinedLength, coordStr } = this.GetCombinedLengthAtIntersection( intersection );
+
+            if ( combinedLength < bestCombinedLength )
+            {
+                bestCombinedLength = combinedLength;
+                bestCoords = coordStr;
+            }
+        }
+
+        console.log( `Best combined length = ${bestCombinedLength} at intersection ${bestCoords}` );
+        return bestCombinedLength;
+    }
+
+    private GetCombinedLengthAtIntersection( intersection: [string, Map<number, number>] )
+    {
+        const coordStr = intersection[0];
+        const wiresHere = intersection[1];
+        let combinedLength = 0;
+        wiresHere.forEach( ( wireLength ) =>
+        {
+            combinedLength += wireLength;
+        } );
+        return { combinedLength, coordStr };
     }
 
     private getManhattanDistanceToPointFromOrigin( coordStr: string ): number
@@ -98,29 +127,44 @@ export class WireCrosser
 
                 const coordStr = coord.toString();
                 this.log( `wire ${iWire} at ${coordStr}` );
+
                 if ( this.WireCrossesAnotherWireHere( coordStr, iWire ) )
                 {
+                    const wiresAlreadyHere: Map<WireIndex, WireLengthAtCollisionPoint> = this.occupiedPoints.get( coordStr );
+
+                    // If this is the first collision here, we need to mark the first wire that already exists here as a collision wire
+                    if ( wiresAlreadyHere.size === 1 )
+                    {
+                        for ( const mapEntry of wiresAlreadyHere )
+                        {
+                            const iWire = mapEntry[0];
+                            const wireLength = mapEntry[1];
+                            this.AddCollisionHere( coordStr, iWire, wireLength );
+                        }
+                    }
+
+                    // Add the new wire as a collision
                     this.AddCollisionHere( coordStr, iWire, wireLength );
                 }
 
-                this.AddOccupantHere( coordStr, iWire );
+                this.AddOccupantHere( coordStr, iWire, wireLength );
             };
 
             currentPosition = [currentPosition[0] + dx, currentPosition[1] + dy];
         } );
     }
 
-    private AddOccupantHere( coordStr: string, iWire: number )
+    private AddOccupantHere( coordStr: string, iWire: number, wireLength: number )
     {
         if ( this.occupiedPoints.has( coordStr ) )
         {
             let wiresHere = this.occupiedPoints.get( coordStr );
-            wiresHere.add( iWire );
+            wiresHere.set( iWire, wireLength );
             this.occupiedPoints.set( coordStr, wiresHere );
         }
         else
         {
-            this.occupiedPoints.set( coordStr, new Set<number>( [iWire] ) );
+            this.occupiedPoints.set( coordStr, new Map<number, number>( [[iWire, wireLength]] ) );
         }
     }
 
@@ -128,7 +172,7 @@ export class WireCrosser
     {
         if ( this.collisionPoints.has( coordStr ) )
         {
-            let wiresHere = this.collisionPoints.get( coordStr );
+            let wiresHere = this.occupiedPoints.get( coordStr );
             wiresHere.set( iWire, wireLengthHere );
             this.collisionPoints.set( coordStr, wiresHere );
         }

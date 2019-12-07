@@ -48,11 +48,6 @@ describe( 'WireCrosser', () =>
 {
     let m_testSubject;
 
-    beforeEach( () =>
-    {
-        // Set up tests
-    } );
-
     itParam( 'getManhattanDistanceToNearestWireCrossing', testDataA, ( value: WirePathTestDatum ) =>
     {
         const enableLogging = false;
@@ -63,14 +58,9 @@ describe( 'WireCrosser', () =>
 
     itParam( 'minimizeSignalDelay', testDataB, ( value: WirePathTestDatum ) =>
     {
-        const enableLogging = false;
+        const enableLogging = true;
         m_testSubject = new WireCrosser( value.wirePaths, enableLogging );
         const result = m_testSubject.minimizeSignalDelay();
         expect( result ).to.equal( value.expectedOutput );
-    } );
-
-    afterEach( () =>
-    {
-        // Tear down tests
     } );
 } );

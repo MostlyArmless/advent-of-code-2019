@@ -1,6 +1,4 @@
 #!/usr/bin/env node
-import { problem2 } from './problem2'
-import { problem3a, problem3b } from './problem3';
 
 // CLI syntax example to run problem 2
 // npm start -- 2
