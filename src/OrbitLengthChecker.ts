@@ -21,8 +21,6 @@ export class OrbitLengthChecker
         this.tree = new TreeNode( "" );
         this.createdNodes = new Map<string, TreeNode>();
         this.leaves = [];
-        this.you = new TreeNode( '' );
-        this.santa = new TreeNode( '' );
 
         this.buildOrbitTree();
     }
@@ -39,17 +37,14 @@ export class OrbitLengthChecker
 
     minimumTransfersToSantasParentPlanet(): number
     {
-        if ( !this.you || this.you.name.length === 0 )
-            throw new Error( "'YOU' was not found when building the tree!" );
+        const you = this.createdNodes.get( 'YOU' );
+        const santa = this.createdNodes.get( 'SAN' );
 
-        if ( !this.santa || this.santa.name.length === 0 )
-            throw new Error( "'SAN' was not found when building the tree!" );
+        const commonAncestor = this.tree.GetNearestCommonAncestor( you, santa );
+        const distanceFromYouToCommonAncestor = you.getDistanceToTargetAncestor( commonAncestor );
+        const distanceFromSantaToCommonAncestor = santa.getDistanceToTargetAncestor( commonAncestor );
 
-        const commonAncestor = this.tree.GetNearestCommonAncestor( this.you, this.santa );
-        const distanceYouToCommonAncestor = this.you.getDistanceToTargetAncestor( commonAncestor );
-        const distanceSantaToCommonAncestor = this.santa.getDistanceToTargetAncestor( commonAncestor );
-
-        return distanceSantaToCommonAncestor + distanceYouToCommonAncestor - 2;
+        return distanceFromSantaToCommonAncestor + distanceFromYouToCommonAncestor - 2;
     }
 
     private buildOrbitTree(): void
@@ -110,16 +105,6 @@ export class OrbitLengthChecker
             else if ( childName === "COM" )
             {
                 throw new Error( "COM is not supposed to have any parents!" );
-            }
-
-            // Keep track of special nodes for later
-            if ( childName === 'YOU' )
-            {
-                this.you = childNode;
-            }
-            else if ( childName === 'SAN' )
-            {
-                this.santa = childNode;
             }
         } );
     }
