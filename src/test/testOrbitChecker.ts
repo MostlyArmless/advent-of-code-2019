@@ -19,6 +19,22 @@ describe( 'OrbitChecker', () =>
         "K)L"
     ];
 
+    const orbitsWithYouAndSanta = [
+        "COM)B",
+        "B)C",
+        "C)D",
+        "D)E",
+        "E)F",
+        "B)G",
+        "G)H",
+        "D)I",
+        "E)J",
+        "J)K",
+        "K)L",
+        "K)YOU",
+        "I)SAN"
+    ];
+
     describe( 'Builds Tree Correctly', () =>
     {
         it( 'Nodes given in descending order', () =>
@@ -96,7 +112,7 @@ describe( 'OrbitChecker', () =>
     {
         it( 'Nodes given in descending order', () =>
         {
-            const testSubject = new OrbitLengthChecker( orbits );
+            const testSubject = new OrbitLengthChecker( orbitsWithYouAndSanta );
             const result = testSubject.minimumTransfersToSantasParentPlanet();
 
             expect( result ).to.equal( 4 );

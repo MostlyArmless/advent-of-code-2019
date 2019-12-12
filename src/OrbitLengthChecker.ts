@@ -39,6 +39,12 @@ export class OrbitLengthChecker
 
     minimumTransfersToSantasParentPlanet(): number
     {
+        if ( !this.you || this.you.name.length === 0 )
+            throw new Error( "'YOU' was not found when building the tree!" );
+
+        if ( !this.santa || this.santa.name.length === 0 )
+            throw new Error( "'SAN' was not found when building the tree!" );
+
         const commonAncestor = this.tree.GetNearestCommonAncestor( this.you, this.santa );
         const distanceYouToCommonAncestor = this.you.getDistanceToTargetAncestor( commonAncestor );
         const distanceSantaToCommonAncestor = this.santa.getDistanceToTargetAncestor( commonAncestor );
