@@ -1,4 +1,4 @@
-import { TreeNode } from "./Tree";
+import { TreeNode } from "./TreeNode";
 
 interface OrbitalPair
 {
@@ -12,6 +12,8 @@ export class OrbitLengthChecker
     tree: TreeNode;
     createdNodes: Map<string, TreeNode>;
     leaves: TreeNode[];
+    you: TreeNode;
+    santa: TreeNode;
 
     constructor( orbits: string[] )
     {
@@ -19,6 +21,8 @@ export class OrbitLengthChecker
         this.tree = new TreeNode( "" );
         this.createdNodes = new Map<string, TreeNode>();
         this.leaves = [];
+        this.you = new TreeNode( '' );
+        this.santa = new TreeNode( '' );
 
         this.buildOrbitTree();
     }
@@ -30,20 +34,16 @@ export class OrbitLengthChecker
 
     totalNumberOfOrbits(): number
     {
-        // this.leaves = Array.from( this.tree.GetAllLeafNodes() );
-
-        // // Now that the tree exists, we can traverse it to count the number of orbits
-        // const leafNodes = this.tree.GetAllLeafNodes();
-
-        // let sumOfLeafToRootDistances = 0;
-        // leafNodes.forEach( leaf =>
-        // {
-        //     sumOfLeafToRootDistances += leaf.GetDistanceToRootNode();
-        // } );
-        // 
-        // return sumOfLeafToRootDistances;
-
         return this.tree.GetSumOfAllNodeToRootDistances();
+    }
+
+    minimumTransfersToSantasParentPlanet(): number
+    {
+        const commonAncestor = this.tree.GetNearestCommonAncestor( this.you, this.santa );
+        const distanceYouToCommonAncestor = this.you.getDistanceToTargetAncestor( commonAncestor );
+        const distanceSantaToCommonAncestor = this.santa.getDistanceToTargetAncestor( commonAncestor );
+
+        return distanceSantaToCommonAncestor + distanceYouToCommonAncestor - 2;
     }
 
     private buildOrbitTree(): void
@@ -104,6 +104,16 @@ export class OrbitLengthChecker
             else if ( childName === "COM" )
             {
                 throw new Error( "COM is not supposed to have any parents!" );
+            }
+
+            // Keep track of special nodes for later
+            if ( childName === 'YOU' )
+            {
+                this.you = childNode;
+            }
+            else if ( childName === 'SAN' )
+            {
+                this.santa = childNode;
             }
         } );
     }

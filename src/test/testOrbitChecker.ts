@@ -91,4 +91,15 @@ describe( 'OrbitChecker', () =>
             expect( testSubject.totalNumberOfOrbits() ).to.equal( 42 );
         } );
     } );
+
+    describe( 'minimumTransfersToSantasParentPlanet', () =>
+    {
+        it( 'Nodes given in descending order', () =>
+        {
+            const testSubject = new OrbitLengthChecker( orbits );
+            const result = testSubject.minimumTransfersToSantasParentPlanet();
+
+            expect( result ).to.equal( 4 );
+        } );
+    } );
 } );
