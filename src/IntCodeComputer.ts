@@ -1,42 +1,99 @@
+import * as readline from 'readline-sync';
+
+enum ParamMode
+{
+    Position,
+    Immediate
+}
+
+enum OpCode
+{
+    Add = 1,
+    Multiply = 2,
+    StdIn = 3,
+    StdOut = 4,
+    End = 99
+}
+
+interface Instruction
+{
+    opCode: OpCode;
+    paramModes: ParamMode[];
+    resultAddress: number;
+    distanceToNextInstruction: number; // Amount you need to increment the program counter by to reach the next instruction
+}
+
+interface InstructionInfo
+{
+    numParams: number;
+    storesResult: boolean;
+    resultOffset: number | null;
+    instructionLength: number;
+}
+
 export class IntCodeComputer
 {
     enableLogging: boolean = false;
     memory: number[];
     pos: number;
     shouldContinue: boolean;
+    params: number[];
+    paramModes: ParamMode[];
+    resultAddress: number;
+    numInstructionsProcessed: number;
 
     constructor( enableLogging?: boolean )
     {
         if ( enableLogging != undefined )
             this.enableLogging = enableLogging;
 
+        this.reset();
+    }
+
+    reset(): void
+    {
         this.memory = [];
         this.pos = 0;
         this.shouldContinue = true;
+        this.params = [null, null, null, null];
+        this.paramModes = [null, null, null, null]
+        this.numInstructionsProcessed = 0;
+        this.resultAddress = null;
     }
 
-    log( msg: string ): void
+    private log( msg: string ): void
     {
         if ( this.enableLogging )
             console.log( msg );
     }
 
-    runNextInstruction(): void
+    private runNextInstruction(): void
     {
         this.log( `pos = ${this.pos}` );
-        this.log( `memoryBefore=${this.memory}` );
-        const op = this.memory[this.pos];
+        const instruction = this.ParseInstruction();
+        this.log( `INSTRUCTION = ${instruction.opCode}, Parameter modes = ${instruction.paramModes}` );
+        const params = this.GetParams( instruction.paramModes );
 
-        switch ( op )
+        switch ( instruction.opCode )
         {
-            case 1: // ADD
+            case 1:
                 {
-                    this.Add();
+                    this.Add( params[0], params[1], instruction.resultAddress );
                     break;
                 }
-            case 2: // MULTIPLY
+            case 2:
                 {
-                    this.Multiply();
+                    this.Multiply( params[0], params[1], instruction.resultAddress );
+                    break;
+                }
+            case 3:
+                {
+                    this.StdIn( instruction.resultAddress );
+                    break;
+                }
+            case 4:
+                {
+                    this.StdOut( params[0] );
                     break;
                 }
             case 99: // END
@@ -46,42 +103,129 @@ export class IntCodeComputer
                 }
             default:
                 {
-                    console.error( `Attempted to run invalid instruction '${op}' at position ${this.pos}` );
+                    console.error( `Attempted to run invalid instruction '${instruction.opCode}' at position ${this.pos}` );
                     this.shouldContinue = false;
                 }
         }
 
-        this.log( `memoryAfter=${this.memory}` );
-
         // Increment the program counter
-        this.pos += 4;
+        // this.log( `Incrementing program counter by ${instruction.distanceToNextInstruction}` );
+        this.pos += instruction.distanceToNextInstruction;
+        this.numInstructionsProcessed += 1;
+        // this.log( `Completed ${this.numInstructionsProcessed} instructions.` );
+        this.log( "" ); // To visually separate different instructions
     }
 
-    private Multiply()
+    private GetInstructionInfo( opCode: OpCode ): InstructionInfo
     {
-        const posA = this.memory[this.pos + 1];
-        const posB = this.memory[this.pos + 2];
-        const posResult = this.memory[this.pos + 3];
-        const a = this.memory[posA];
-        const b = this.memory[posB];
-        const result = a * b;
-        this.log( `Multiplying memory[${posA}](${a}) * memory[${posB}](${b}), storing ${result} at memory[${posResult}]` );
-        this.memory[posResult] = result;
+        let instructionInfo = {
+            numParams: 0,
+            storesResult: false,
+            resultOffset: null,
+            instructionLength: 0
+        };
+
+        switch ( opCode )
+        {
+            case OpCode.Add:
+            case OpCode.Multiply:
+                instructionInfo.numParams = 2;
+                instructionInfo.storesResult = true;
+                instructionInfo.resultOffset = instructionInfo.numParams + 1;
+                instructionInfo.instructionLength = 4;
+                break;
+            case OpCode.StdIn:
+                instructionInfo.numParams = 1;
+                instructionInfo.storesResult = true;
+                instructionInfo.resultOffset = instructionInfo.numParams;
+                instructionInfo.instructionLength = 2;
+                break;
+            case OpCode.StdOut:
+                instructionInfo.numParams = 1;
+                instructionInfo.storesResult = false;
+                instructionInfo.instructionLength = 2;
+                break;
+            case OpCode.End:
+                instructionInfo.numParams = 0;
+                instructionInfo.storesResult = false;
+                instructionInfo.instructionLength = 1;
+                break;
+        }
+
+        return instructionInfo;
     }
 
-    private Add()
+    private ParseInstruction(): Instruction
     {
-        const posA = this.memory[this.pos + 1];
-        const posB = this.memory[this.pos + 2];
-        const posResult = this.memory[this.pos + 3];
-        const a = this.memory[posA];
-        const b = this.memory[posB];
-        const result = a + b;
-        this.log( `Adding memory[${posA}](${a}) + memory[${posB}](${b}), storing ${result} at memory[${posResult}]` );
-        this.memory[posResult] = result;
+        const opString = this.memory[this.pos].toString();
+        const opCode = parseInt( opString.slice( -2 ) ) as OpCode;
+        let paramModes = opString.slice( 0, -2 ).split( '' ).reverse().map( char => parseInt( char ) );
+
+        const instructionInfo = this.GetInstructionInfo( opCode );
+
+        while ( paramModes.length !== instructionInfo.numParams )
+        {
+            paramModes.push( 0 );
+        }
+
+        return {
+            opCode: opCode,
+            paramModes: paramModes,
+            resultAddress: instructionInfo.storesResult ? this.memory[this.pos + instructionInfo.resultOffset] : null,
+            distanceToNextInstruction: instructionInfo.instructionLength
+        };
     }
 
-    loadProgram( program: number[], arg1?: number, arg2?: number )
+    private GetParams( paramModes: ParamMode[] ): number[]
+    {
+        let params = Array( paramModes.length );
+
+        for ( let i = 0; i < paramModes.length; i++ )
+        {
+            switch ( paramModes[i] )
+            {
+                case ParamMode.Position:
+                    {
+                        const address = this.memory[this.pos + i + 1];
+                        params[i] = this.memory[address];
+                        break;
+                    }
+                case ParamMode.Immediate:
+                    {
+                        params[i] = this.memory[this.pos + i + 1];
+                        break;
+                    }
+            }
+        }
+
+        return params;
+    }
+
+    private Multiply( A, B, resultAddress ): void
+    {
+        this.log( `Storing ${A} * ${B} at address ${resultAddress}` );
+        this.memory[resultAddress] = A * B;
+    }
+
+    private Add( A, B, resultAddress ): void
+    {
+        this.log( `Storing ${A} + ${B} at address ${resultAddress}` );
+        this.memory[resultAddress] = A + B;
+    }
+
+    private StdIn( resultAddress ): void
+    {
+        const input = parseInt( readline.question( 'Enter a number: ' ) );
+        this.log( `Storing value ${input} at address ${resultAddress}` );
+        this.memory[resultAddress] = input;
+    }
+
+    private StdOut( valueToPrint ): void
+    {
+        console.log( `STDOUT: '${valueToPrint}'` );
+    }
+
+    loadProgram( program: number[], arg1?: number, arg2?: number ): void
     {
         this.memory = Array.from( program ); // Copy the input array, don't take it by reference.
         if ( arg1 != undefined )
@@ -101,12 +245,13 @@ export class IntCodeComputer
             this.runNextInstruction();
         }
 
-        this.log( `final memory state = ${this.memory}` );
-        this.log( `result = ${this.memory[0]}` );
+        this.log( `Finished running after ${this.numInstructionsProcessed} steps.` );
+        this.log( `Final memory state = ${this.memory}` );
+        this.log( `Result = ${this.memory[0]}` );
         return this.memory[0];
     }
 
-    clearMemory()
+    clearMemory(): void
     {
         this.memory = [];
     }
@@ -114,12 +259,5 @@ export class IntCodeComputer
     dumpMemory(): number[]
     {
         return this.memory;
-    }
-
-    reset(): void
-    {
-        this.clearMemory();
-        this.pos = 0;
-        this.shouldContinue = true;
     }
 }

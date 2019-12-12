@@ -60,7 +60,7 @@ const testDataB: PasswordCrackerTestDatum[] = [
     }
 ];
 
-describe.only( 'PasswordCracker', () =>
+describe( 'PasswordCracker', () =>
 {
     itParam( 'hasPairOfMatchingDigits', testDataA, ( value: PasswordCrackerTestDatum ) =>
     {

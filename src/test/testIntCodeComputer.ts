@@ -32,6 +32,14 @@ const testData = [
     {
         input: [1, 1, 1, 4, 99, 5, 6, 0, 99],
         expectedOutput: [30, 1, 1, 4, 2, 5, 6, 0, 99]
+    },
+    {
+        input: [1002, 4, 3, 4, 33],
+        expectedOutput: [1002, 4, 3, 4, 99]
+    },
+    {
+        input: [1101, 100, -1, 4, 0],
+        expectedOutput: [1101, 100, -1, 4, 99]
     }
 ];
 
@@ -46,7 +54,7 @@ describe( 'IntCodeComputer', () =>
         m_testSubject.reset();
     } );
 
-    itParam( 'Running program results in the correct memory state', testData, ( value ) =>
+    itParam( "Programs that don't take any input", testData, ( value ) =>
     {
         const program = value.input;
         m_testSubject.loadProgram( program );
@@ -55,9 +63,12 @@ describe( 'IntCodeComputer', () =>
         expect( programMemory ).to.eql( value.expectedOutput ); // use 'eql' to check array equality. 'equal' will return false here because the arrays are at different memory locations.
     } );
 
-    afterEach( () =>
+    it( 'Program that prints whatever input it is given', () =>
     {
-        // Tear down tests
+        m_testSubject.enableLogging = true;
+        m_testSubject.loadProgram( [3, 0, 4, 0, 99] );
+        const result = m_testSubject.runProgram();
+        console.log( `Done. Result = ${result}` );
     } );
 } );
 
