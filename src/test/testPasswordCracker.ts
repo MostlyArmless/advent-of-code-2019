@@ -6,69 +6,62 @@ import * as chai from 'chai';
 import { hasPairOfMatchingDigits, hasPairOfMatchingDigitsNotPartOfLargerGroup } from '../problem4';
 chai.use( require( 'chai-as-promised' ) ); // Extension that defines the "eventually" keyword
 chai.use( require( 'chai-string' ) ); // Extension that provides the "string should contain" functionality
-let itParam = require( 'mocha-param' );
-
-interface PasswordCrackerTestDatum
-{
-    input: number;
-    expectedOutput: boolean;
-}
-
-const testDataA: PasswordCrackerTestDatum[] = [
-    {
-        input: 111111,
-        expectedOutput: true
-    },
-    {
-        input: 223450,
-        expectedOutput: true
-    },
-    {
-        input: 120382,
-        expectedOutput: false
-    },
-    {
-        input: 203822,
-        expectedOutput: true
-    }
-];
-
-const testDataB: PasswordCrackerTestDatum[] = [
-    {
-        input: 111111,
-        expectedOutput: false
-    },
-    {
-        input: 223450,
-        expectedOutput: true
-    },
-    {
-        input: 120382,
-        expectedOutput: false
-    },
-    {
-        input: 203822,
-        expectedOutput: true
-    },
-    {
-        input: 111244,
-        expectedOutput: true
-    },
-    {
-        input: 111444,
-        expectedOutput: false
-    }
-];
 
 describe( 'PasswordCracker', () =>
 {
-    itParam( 'hasPairOfMatchingDigits', testDataA, ( value: PasswordCrackerTestDatum ) =>
+    describe( 'Has Pair of Matching Digits', () =>
     {
-        expect( hasPairOfMatchingDigits( value.input.toString() ) ).to.equal( value.expectedOutput );
+        it( 'All ones', () =>
+        {
+            expect( hasPairOfMatchingDigits( '111111' ) ).to.be.true;
+        } );
+
+        it( 'Double at the start', () =>
+        {
+            expect( hasPairOfMatchingDigits( '223450' ) ).to.be.true;
+        } );
+
+        it( 'No double', () =>
+        {
+            expect( hasPairOfMatchingDigits( '120382' ) ).to.be.false;
+        } );
+
+        it( 'Double at the end', () =>
+        {
+            expect( hasPairOfMatchingDigits( '203822' ) ).to.be.true;
+        } );
     } );
 
-    itParam( 'hasPairOfMatchingDigitsNotPartOfLargerGroup', testDataB, ( value: PasswordCrackerTestDatum ) =>
+    describe( 'Has Pair of Matching Digits Not Part Of Larger Group', () =>
     {
-        expect( hasPairOfMatchingDigitsNotPartOfLargerGroup( value.input.toString() ) ).to.equal( value.expectedOutput );
+        it( 'All ones', () =>
+        {
+            expect( hasPairOfMatchingDigitsNotPartOfLargerGroup( '111111' ) ).to.be.false;
+        } );
+
+        it( 'Double at the start', () =>
+        {
+            expect( hasPairOfMatchingDigitsNotPartOfLargerGroup( '223450' ) ).to.be.true;
+        } );
+
+        it( 'No double', () =>
+        {
+            expect( hasPairOfMatchingDigitsNotPartOfLargerGroup( '120382' ) ).to.be.false;
+        } );
+
+        it( 'Double at the end', () =>
+        {
+            expect( hasPairOfMatchingDigitsNotPartOfLargerGroup( '203822' ) ).to.be.true;
+        } );
+
+        it( 'Triplet and doublet', () =>
+        {
+            expect( hasPairOfMatchingDigitsNotPartOfLargerGroup( '111244' ) ).to.be.true;
+        } );
+
+        it( 'Two Triplets', () =>
+        {
+            expect( hasPairOfMatchingDigitsNotPartOfLargerGroup( '111444' ) ).to.be.false;
+        } );
     } );
 } );

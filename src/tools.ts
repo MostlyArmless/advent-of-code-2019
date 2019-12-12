@@ -17,7 +17,7 @@ export function measureExecutionTime( func: Function, args?: any[], numIteration
             duration = process.hrtime( t1 );
         }
 
-        console.log( `runtime = ${duration[0]}.${duration[1]} s` );
+        console.log( `runtime of ${func.name} = ${duration[0]}.${duration[1]} s` );
 
         return parseFloat( `${duration[0]}.${duration[1]}` );
     }

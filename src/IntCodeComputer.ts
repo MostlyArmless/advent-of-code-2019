@@ -1,4 +1,5 @@
-import * as readline from 'readline-sync';
+import { IStdIn, IStdOut } from './interfaces';
+import { GetInstructionInfo } from './InstructionInfoRetriever';
 
 enum ParamMode
 {
@@ -6,12 +7,16 @@ enum ParamMode
     Immediate
 }
 
-enum OpCode
+export enum OpCode
 {
     Add = 1,
     Multiply = 2,
     StdIn = 3,
     StdOut = 4,
+    JumpIfTrue = 5,
+    JumpIfFalse = 6,
+    LessThan = 7,
+    Equals = 8,
     End = 99
 }
 
@@ -21,14 +26,6 @@ interface Instruction
     paramModes: ParamMode[];
     resultAddress: number;
     distanceToNextInstruction: number; // Amount you need to increment the program counter by to reach the next instruction
-}
-
-interface InstructionInfo
-{
-    numParams: number;
-    storesResult: boolean;
-    resultOffset: number | null;
-    instructionLength: number;
 }
 
 export class IntCodeComputer
@@ -41,13 +38,17 @@ export class IntCodeComputer
     paramModes: ParamMode[];
     resultAddress: number;
     numInstructionsProcessed: number;
+    stdIn: IStdIn;
+    stdOut: IStdOut;
 
-    constructor( enableLogging?: boolean )
+    constructor( stdIn: IStdIn, stdOut: IStdOut, enableLogging?: boolean )
     {
         if ( enableLogging != undefined )
             this.enableLogging = enableLogging;
 
         this.reset();
+        this.stdIn = stdIn;
+        this.stdOut = stdOut;
     }
 
     reset(): void
@@ -73,27 +74,48 @@ export class IntCodeComputer
         const instruction = this.ParseInstruction();
         this.log( `INSTRUCTION = ${instruction.opCode}, Parameter modes = ${instruction.paramModes}` );
         const params = this.GetParams( instruction.paramModes );
+        let nextInstructionAddress = this.pos + instruction.distanceToNextInstruction;
 
         switch ( instruction.opCode )
         {
-            case 1:
+            case OpCode.Add:
                 {
                     this.Add( params[0], params[1], instruction.resultAddress );
                     break;
                 }
-            case 2:
+            case OpCode.Multiply:
                 {
                     this.Multiply( params[0], params[1], instruction.resultAddress );
                     break;
                 }
-            case 3:
+            case OpCode.StdIn:
                 {
-                    this.StdIn( instruction.resultAddress );
+                    this.ReadFromStdIn( instruction.resultAddress );
                     break;
                 }
-            case 4:
+            case OpCode.StdOut:
                 {
-                    this.StdOut( params[0] );
+                    this.WriteToStdOut( params[0] );
+                    break;
+                }
+            case OpCode.JumpIfTrue:
+                {
+                    nextInstructionAddress = this.JumpIfTrue( params[0], params[1], nextInstructionAddress );
+                    break;
+                }
+            case OpCode.JumpIfFalse:
+                {
+                    nextInstructionAddress = this.JumpIfFalse( params[0], params[1], nextInstructionAddress );
+                    break;
+                }
+            case OpCode.LessThan:
+                {
+                    this.LessThan( params[0], params[1], instruction.resultAddress );
+                    break;
+                }
+            case OpCode.Equals:
+                {
+                    this.Equals( params[0], params[1], instruction.resultAddress );
                     break;
                 }
             case 99: // END
@@ -109,51 +131,12 @@ export class IntCodeComputer
         }
 
         // Increment the program counter
-        // this.log( `Incrementing program counter by ${instruction.distanceToNextInstruction}` );
-        this.pos += instruction.distanceToNextInstruction;
+        this.pos = nextInstructionAddress;
         this.numInstructionsProcessed += 1;
-        // this.log( `Completed ${this.numInstructionsProcessed} instructions.` );
         this.log( "" ); // To visually separate different instructions
     }
 
-    private GetInstructionInfo( opCode: OpCode ): InstructionInfo
-    {
-        let instructionInfo = {
-            numParams: 0,
-            storesResult: false,
-            resultOffset: null,
-            instructionLength: 0
-        };
 
-        switch ( opCode )
-        {
-            case OpCode.Add:
-            case OpCode.Multiply:
-                instructionInfo.numParams = 2;
-                instructionInfo.storesResult = true;
-                instructionInfo.resultOffset = instructionInfo.numParams + 1;
-                instructionInfo.instructionLength = 4;
-                break;
-            case OpCode.StdIn:
-                instructionInfo.numParams = 1;
-                instructionInfo.storesResult = true;
-                instructionInfo.resultOffset = instructionInfo.numParams;
-                instructionInfo.instructionLength = 2;
-                break;
-            case OpCode.StdOut:
-                instructionInfo.numParams = 1;
-                instructionInfo.storesResult = false;
-                instructionInfo.instructionLength = 2;
-                break;
-            case OpCode.End:
-                instructionInfo.numParams = 0;
-                instructionInfo.storesResult = false;
-                instructionInfo.instructionLength = 1;
-                break;
-        }
-
-        return instructionInfo;
-    }
 
     private ParseInstruction(): Instruction
     {
@@ -161,7 +144,7 @@ export class IntCodeComputer
         const opCode = parseInt( opString.slice( -2 ) ) as OpCode;
         let paramModes = opString.slice( 0, -2 ).split( '' ).reverse().map( char => parseInt( char ) );
 
-        const instructionInfo = this.GetInstructionInfo( opCode );
+        const instructionInfo = GetInstructionInfo( opCode );
 
         while ( paramModes.length !== instructionInfo.numParams )
         {
@@ -213,16 +196,42 @@ export class IntCodeComputer
         this.memory[resultAddress] = A + B;
     }
 
-    private StdIn( resultAddress ): void
+    private ReadFromStdIn( resultAddress ): void
     {
-        const input = parseInt( readline.question( 'Enter a number: ' ) );
+        const input = this.stdIn.getInput();
         this.log( `Storing value ${input} at address ${resultAddress}` );
         this.memory[resultAddress] = input;
     }
 
-    private StdOut( valueToPrint ): void
+    private WriteToStdOut( valueToPrint ): void
     {
-        console.log( `STDOUT: '${valueToPrint}'` );
+        this.stdOut.sendOutput( valueToPrint );
+    }
+
+    private JumpIfTrue( param: number, jumpAddress: number, nextInstructionAddress: number )
+    {
+        if ( param !== 0 )
+            return jumpAddress;
+        else
+            return nextInstructionAddress;
+    }
+
+    private JumpIfFalse( param: number, jumpAddress: number, nextInstructionAddress: number )
+    {
+        if ( param === 0 )
+            return jumpAddress;
+        else
+            return nextInstructionAddress;
+    }
+
+    private LessThan( A: number, B: number, resultAddress )
+    {
+        this.memory[resultAddress] = A < B ? 1 : 0;
+    }
+
+    private Equals( A: number, B: number, resultAddress )
+    {
+        this.memory[resultAddress] = A === B ? 1 : 0;
     }
 
     loadProgram( program: number[], arg1?: number, arg2?: number ): void
