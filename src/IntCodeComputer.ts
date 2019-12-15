@@ -40,8 +40,9 @@ export class IntCodeComputer
     numInstructionsProcessed: number;
     stdIn: IStdIn;
     stdOut: IStdOut;
+    id: number;
 
-    constructor( stdIn: IStdIn, stdOut: IStdOut, enableLogging?: boolean )
+    constructor( stdIn: IStdIn, stdOut: IStdOut, enableLogging?: boolean, id?: number )
     {
         if ( enableLogging != undefined )
             this.enableLogging = enableLogging;
@@ -49,6 +50,7 @@ export class IntCodeComputer
         this.reset();
         this.stdIn = stdIn;
         this.stdOut = stdOut;
+        this.id = id === undefined ? 0 : id;
     }
 
     reset(): void
@@ -68,7 +70,7 @@ export class IntCodeComputer
             console.log( msg );
     }
 
-    private runNextInstruction(): void
+    private async runNextInstruction(): Promise<void>
     {
         this.log( `pos = ${this.pos}` );
         const instruction = this.ParseInstruction();
@@ -90,7 +92,7 @@ export class IntCodeComputer
                 }
             case OpCode.StdIn:
                 {
-                    this.ReadFromStdIn( instruction.resultAddress );
+                    await this.ReadFromStdIn( instruction.resultAddress );
                     break;
                 }
             case OpCode.StdOut:
@@ -196,11 +198,11 @@ export class IntCodeComputer
         this.memory[resultAddress] = A + B;
     }
 
-    private ReadFromStdIn( resultAddress ): void
+    private async ReadFromStdIn( resultAddress ): Promise<void>
     {
-        const input = this.stdIn.getInput();
+        const input = await this.stdIn.getInput();
         if ( input === undefined || input === null || isNaN( input ) )
-            throw new Error( "Failed to read a value from STDIN!" );
+            throw new Error( `${this.id} failed to read a value from STDIN!` );
 
         this.log( `Storing value ${input} at address ${resultAddress}` );
         this.memory[resultAddress] = input;
@@ -250,11 +252,11 @@ export class IntCodeComputer
         this.shouldContinue = true;
     }
 
-    runProgram(): number
+    async runProgram(): Promise<number>
     {
         while ( this.shouldContinue )
         {
-            this.runNextInstruction();
+            await this.runNextInstruction();
             // TODO - disable this for performance
             if ( !this.validateMemory() )
             {

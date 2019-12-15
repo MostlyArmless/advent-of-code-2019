@@ -6,9 +6,10 @@ export interface ExecutionTimerResult
     functionOutput: any;
 }
 
-export function measureExecutionTime( func: Function, args?: any[], numIterations?: number ): ExecutionTimerResult
+export async function measureExecutionTime( func: Function, args?: any[], numIterations?: number ): Promise<ExecutionTimerResult>
 {
     let functionRetVal;
+    const isAsync = func.constructor.name === 'AsyncFunction';
 
     if ( numIterations == undefined || numIterations === 1 )
     {
@@ -16,13 +17,13 @@ export function measureExecutionTime( func: Function, args?: any[], numIteration
         if ( args == undefined )
         {
             const t1 = process.hrtime();
-            functionRetVal = func();
+            functionRetVal = isAsync ? await func() : func();
             duration = process.hrtime( t1 );
         }
         else
         {
             const t1 = process.hrtime();
-            functionRetVal = func( ...args );
+            functionRetVal = isAsync ? await func( ...args ) : func( ...args );
             duration = process.hrtime( t1 );
         }
 
@@ -42,13 +43,13 @@ export function measureExecutionTime( func: Function, args?: any[], numIteration
             if ( args == undefined )
             {
                 const t1 = process.hrtime();
-                functionRetVal = func();
+                functionRetVal = isAsync ? await func() : func();
                 duration = process.hrtime( t1 );
             }
             else
             {
                 const t1 = process.hrtime();
-                functionRetVal = func( ...args );
+                functionRetVal = isAsync ? await func( ...args ) : func( ...args );
                 duration = process.hrtime( t1 );
             }
             durations[i] = parseFloat( `${duration[0]}.${duration[1]}` );

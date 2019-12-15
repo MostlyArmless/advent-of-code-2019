@@ -16,7 +16,7 @@ export class Amplifier
         this.inputBuffer = inputBuffer;
         this.outputBuffer = outputBuffer;
         this.program = program;
-        this.computer = new IntCodeComputer( this.inputBuffer, this.outputBuffer, false );
+        this.computer = new IntCodeComputer( this.inputBuffer, this.outputBuffer, false, iAmp );
         this.computer.loadProgram( program );
         this.iAmp = iAmp;
     }
@@ -34,9 +34,9 @@ export class Amplifier
         this.inputBuffer.queue.pushBack( phaseValue );
     }
 
-    runProgram(): void
+    async runProgram(): Promise<number>
     {
-        this.computer.runProgram();
+        return await this.computer.runProgram();
     }
 
     log( msg: string ): void

@@ -3,7 +3,7 @@ import * as readline from 'readline-sync';
 
 export class HumanInputRetriever implements IStdIn
 {
-    getInput(): number
+    async getInput(): Promise<number>
     {
         return parseInt( readline.question( 'Enter a number: ' ) );
     }

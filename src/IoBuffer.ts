@@ -10,9 +10,9 @@ export class IoBuffer implements IStdIn, IStdOut
         this.queue = new Queue();
     }
 
-    getInput(): number
+    async getInput(): Promise<number>
     {
-        return this.queue.popFront();
+        return await this.queue.popFront();
     }
 
     sendOutput( value: number ): void

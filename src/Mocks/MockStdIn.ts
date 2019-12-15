@@ -17,7 +17,7 @@ export class MockStdIn implements IStdIn
         this.index = 0;
     }
 
-    getInput(): number
+    async getInput(): Promise<number>
     {
         const nextNumber = this.values[this.index];
         this.index += 1;

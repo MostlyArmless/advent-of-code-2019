@@ -2,6 +2,8 @@ import { Amplifier } from "./Amplifier";
 import { IoBuffer } from "./IoBuffer";
 import { allPermutations } from "./tools";
 
+export type ConnectionMode = 'serial' | 'feedback';
+
 export class AmplifierArray
 {
     program: number[];
@@ -10,8 +12,9 @@ export class AmplifierArray
     inputBuffer: IoBuffer;
     outputBuffer: IoBuffer;
     enableLogging: boolean;
+    connectionMode: ConnectionMode;
 
-    constructor( numAmplifiers: number, program: number[], enableLogging: boolean )
+    constructor( numAmplifiers, connectionMode: ConnectionMode, program: number[], enableLogging: boolean )
     {
         this.program = program;
         this.enableLogging = enableLogging;
@@ -19,12 +22,20 @@ export class AmplifierArray
         this.inputBuffer = new IoBuffer();
         this.outputBuffer = new IoBuffer();
         this.phaseSequence = Array( numAmplifiers ).fill( null );
+        this.connectionMode = connectionMode;
 
         this.amps = [];
+        this.connectAmplifiers( connectionMode, numAmplifiers, program, enableLogging );
+    }
+
+    private connectAmplifiers( connectionMode: ConnectionMode, numAmplifiers: number, program: number[], enableLogging: boolean )
+    {
+        let firstAmplifierInput = connectionMode === 'serial' ? this.inputBuffer : this.outputBuffer;
+
         const finalAmplifier = numAmplifiers - 1;
         for ( let i = 0; i < numAmplifiers; i++ )
         {
-            const inputBuffer = i === 0 ? this.inputBuffer : this.amps[i - 1].outputBuffer;
+            const inputBuffer = i === 0 ? firstAmplifierInput : this.amps[i - 1].outputBuffer;
             const outputBuffer = i === finalAmplifier ? this.outputBuffer : new IoBuffer();
             this.amps.push( new Amplifier( program, inputBuffer, outputBuffer, enableLogging, i ) );
         }
@@ -48,17 +59,21 @@ export class AmplifierArray
         }
     }
 
-    runAmplifierProgram( inputSignal: number ): number
+    async runAmplifierProgram( inputSignal: number ): Promise<number>
     {
-        this.inputBuffer.queue.pushBack( 0 ); // Input to the first Amplifier is zero
+        this.loadInput( inputSignal );
         this.log( 'BEFORE:' );
         this.printBufferContents();
+
+        let amplifierPromises = [];
         this.amps.forEach( amp =>
         {
-            amp.runProgram();
+            amplifierPromises.push( amp.runProgram() );
             this.log( `After step ${amp.iAmp}` );
             this.printBufferContents();
         } );
+
+        await Promise.all( amplifierPromises );
 
         this.log( 'AFTER:' );
         this.printBufferContents();
@@ -66,8 +81,23 @@ export class AmplifierArray
         return this.amps.slice( -1 )[0].outputBuffer.queue.popFront()
     }
 
+    private loadInput( inputSignal: number ): void
+    {
+        switch ( this.connectionMode )
+        {
+            case 'serial':
+                this.inputBuffer.queue.pushBack( inputSignal );
+                break;
+            case 'feedback':
+                this.outputBuffer.queue.pushBack( inputSignal );
+        }
+    }
+
     private printBufferContents()
     {
+        if ( !this.enableLogging )
+            return;
+
         let msg = '';
         this.amps.map( amp =>
         {
@@ -77,15 +107,11 @@ export class AmplifierArray
         this.log( msg );
     }
 
-    findMaxPossibleOutput( inputSignal: number )
+    async findMaxPossibleOutput( inputSignal: number )
     {
         const numAmplifiers = this.amps.length;
         let maxOutput = Number.MIN_SAFE_INTEGER;
-        let uniquePhaseNumbers = [];
-        for ( let i = 0; i < numAmplifiers; i++ )
-        {
-            uniquePhaseNumbers.push( i );
-        }
+        let uniquePhaseNumbers = this.getPhaseNumbers( numAmplifiers, this.connectionMode );
         const allPossiblePhaseSequences = allPermutations( uniquePhaseNumbers );
         this.log( `Finding maximum possible engine output...` );
 
@@ -98,7 +124,7 @@ export class AmplifierArray
 
             this.reset();
             this.loadPhaseSequence( allPossiblePhaseSequences[i] );
-            const output = this.runAmplifierProgram( inputSignal );
+            const output = await this.runAmplifierProgram( inputSignal );
 
             if ( output > maxOutput )
             {
@@ -110,14 +136,25 @@ export class AmplifierArray
         return { maxOutput, bestPhaseSequence };
     }
 
+    private getPhaseNumbers( numAmplifiers: number, connectionMode: ConnectionMode )
+    {
+        let uniquePhaseNumbers = [];
+        const iMin = connectionMode === 'serial' ? 0 : 5;
+        for ( let i = iMin; i < iMin + numAmplifiers; i++ )
+        {
+            uniquePhaseNumbers.push( i );
+        }
+        return uniquePhaseNumbers;
+    }
+
     sendInput( value: number ): void
     {
         this.inputBuffer.queue.pushBack( value );
     }
 
-    getOutput(): number
+    async getOutput(): Promise<number>
     {
-        return this.outputBuffer.queue.popFront();
+        return await this.outputBuffer.queue.popFront();
     }
 
     log( msg: string ): void

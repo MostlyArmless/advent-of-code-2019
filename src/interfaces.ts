@@ -1,6 +1,6 @@
 export interface IStdIn
 {
-    getInput(): number;
+    getInput(): Promise<number>;
 }
 
 export interface IStdOut

@@ -9,11 +9,11 @@ describe( 'Queue', () =>
 {
     describe( 'Pop', () =>
     {
-        it( 'Pop When Nonempty should return immediately', () =>
+        it( 'Pop When Nonempty should return immediately', async () =>
         {
             const testSubject = new Queue();
             testSubject.pushBack( 1 );
-            const result = testSubject.popFront();
+            const result = await testSubject.popFront();
             expect( result ).to.equal( 1 );
         } );
     } );
