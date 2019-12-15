@@ -12,7 +12,7 @@ function problem5a()
     const airConditionerSystemId = 1;
     const mockStdOut = new MockStdOut();
     const computer = new IntCodeComputer(
-        new MockStdIn( airConditionerSystemId ),
+        new MockStdIn( [airConditionerSystemId] ),
         mockStdOut,
         enableLogging );
 
@@ -26,7 +26,7 @@ function problem5b()
     const thermalRadiatorControllerId = 5;
     const mockStdOut = new MockStdOut();
     const computer = new IntCodeComputer(
-        new MockStdIn( thermalRadiatorControllerId ),
+        new MockStdIn( [thermalRadiatorControllerId] ),
         mockStdOut,
         enableLogging );
 

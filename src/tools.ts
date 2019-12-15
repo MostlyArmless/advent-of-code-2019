@@ -1,25 +1,37 @@
 // Example syntax: measureExecutionTime( console.log, ['hi'], 50 );
-export function measureExecutionTime( func: Function, args?: any[], numIterations?: number ): number
+
+export interface ExecutionTimerResult
 {
+    runtime: number;
+    functionOutput: any;
+}
+
+export function measureExecutionTime( func: Function, args?: any[], numIterations?: number ): ExecutionTimerResult
+{
+    let functionRetVal;
+
     if ( numIterations == undefined || numIterations === 1 )
     {
         let duration;
         if ( args == undefined )
         {
             const t1 = process.hrtime();
-            func();
+            functionRetVal = func();
             duration = process.hrtime( t1 );
         }
         else
         {
             const t1 = process.hrtime();
-            func( ...args );
+            functionRetVal = func( ...args );
             duration = process.hrtime( t1 );
         }
 
         console.log( `runtime of ${func.name} = ${duration[0]}.${duration[1]} s` );
 
-        return parseFloat( `${duration[0]}.${duration[1]}` );
+        return {
+            runtime: parseFloat( `${duration[0]}.${duration[1]}` ),
+            functionOutput: functionRetVal
+        };
     }
     else
     {
@@ -30,13 +42,13 @@ export function measureExecutionTime( func: Function, args?: any[], numIteration
             if ( args == undefined )
             {
                 const t1 = process.hrtime();
-                func();
+                functionRetVal = func();
                 duration = process.hrtime( t1 );
             }
             else
             {
                 const t1 = process.hrtime();
-                func( ...args );
+                functionRetVal = func( ...args );
                 duration = process.hrtime( t1 );
             }
             durations[i] = parseFloat( `${duration[0]}.${duration[1]}` );
@@ -51,6 +63,44 @@ export function measureExecutionTime( func: Function, args?: any[], numIteration
 
         console.log( `average runtime after ${numIterations} iterations = ${avgDuration} s` );
 
-        return avgDuration;
+        return {
+            runtime: avgDuration,
+            functionOutput: functionRetVal
+        };
     }
+}
+
+export function convertDecimalToBaseN( decimalNumber: number, radix: number, precision: number ): string
+{
+    let result = parseInt( decimalNumber.toString(), 10 ).toString( radix );
+
+    while ( result.length < precision )
+    {
+        result = '0' + result;
+    }
+
+    return result;
+}
+
+export function allPermutations( arr: any[] ): any[]
+{
+
+    let ret = [];
+
+    for ( let i = 0; i < arr.length; i = i + 1 )
+    {
+        let rest = allPermutations( arr.slice( 0, i ).concat( arr.slice( i + 1 ) ) );
+
+        if ( !rest.length )
+        {
+            ret.push( [arr[i]] )
+        } else
+        {
+            for ( let j = 0; j < rest.length; j = j + 1 )
+            {
+                ret.push( [arr[i]].concat( rest[j] ) )
+            }
+        }
+    }
+    return ret;
 }

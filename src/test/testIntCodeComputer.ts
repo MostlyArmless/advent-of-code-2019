@@ -103,7 +103,7 @@ describe( 'IntCodeComputer', () =>
         it( 'Take input number and print it', () =>
         {
             const inputValue = 69;
-            const mockInputRetriever = new MockStdIn( inputValue );
+            const mockInputRetriever = new MockStdIn( [inputValue] );
             const mockStdOut = new MockStdOut();
             let m_testSubject = new IntCodeComputer( mockInputRetriever, mockStdOut, enableLogging );
 
@@ -119,7 +119,7 @@ describe( 'IntCodeComputer', () =>
         it( 'Equality, position mode, true', () =>
         {
             const program = [3, 9, 8, 9, 10, 9, 4, 9, 99, -1, 8];
-            m_mockStdIn.setInput( 8 );
+            m_mockStdIn.setInput( [8] );
             m_testSubject.loadProgram( program );
             m_testSubject.runProgram();
             expect( m_mockStdOut.outputs ).to.eql( [1] );
@@ -128,7 +128,7 @@ describe( 'IntCodeComputer', () =>
         it( 'Equality, position mode, false', () =>
         {
             const program = [3, 9, 8, 9, 10, 9, 4, 9, 99, -1, 8];
-            m_mockStdIn.setInput( 7 );
+            m_mockStdIn.setInput( [7] );
             m_testSubject.loadProgram( program );
             m_testSubject.runProgram();
             expect( m_mockStdOut.outputs ).to.eql( [0] );
@@ -137,7 +137,7 @@ describe( 'IntCodeComputer', () =>
         it( 'Less-than, position mode, false', () =>
         {
             const program = [3, 9, 7, 9, 10, 9, 4, 9, 99, -1, 8];
-            m_mockStdIn.setInput( 9 );
+            m_mockStdIn.setInput( [9] );
             m_testSubject.loadProgram( program );
             m_testSubject.runProgram();
             expect( m_mockStdOut.outputs ).to.eql( [0] );
@@ -146,7 +146,7 @@ describe( 'IntCodeComputer', () =>
         it( 'Less-than, position mode, true', () =>
         {
             const program = [3, 9, 7, 9, 10, 9, 4, 9, 99, -1, 8];
-            m_mockStdIn.setInput( 7 );
+            m_mockStdIn.setInput( [7] );
             m_testSubject.loadProgram( program );
             m_testSubject.runProgram();
             expect( m_mockStdOut.outputs ).to.eql( [1] );
@@ -155,7 +155,7 @@ describe( 'IntCodeComputer', () =>
         it( 'Equal, immediate mode, false', () =>
         {
             const program = [3, 3, 1108, -1, 8, 3, 4, 3, 99];
-            m_mockStdIn.setInput( 7 );
+            m_mockStdIn.setInput( [7] );
             m_testSubject.loadProgram( program );
             m_testSubject.runProgram();
             expect( m_mockStdOut.outputs ).to.eql( [0] );
@@ -164,7 +164,7 @@ describe( 'IntCodeComputer', () =>
         it( 'Equal, immediate mode, true', () =>
         {
             const program = [3, 3, 1108, -1, 8, 3, 4, 3, 99];
-            m_mockStdIn.setInput( 8 );
+            m_mockStdIn.setInput( [8] );
             m_testSubject.loadProgram( program );
             m_testSubject.runProgram();
             expect( m_mockStdOut.outputs ).to.eql( [1] );
@@ -173,7 +173,7 @@ describe( 'IntCodeComputer', () =>
         it( 'Less-than, immediate mode, false', () =>
         {
             const program = [3, 3, 1107, -1, 8, 3, 4, 3, 99];
-            m_mockStdIn.setInput( 10 );
+            m_mockStdIn.setInput( [10] );
             m_testSubject.loadProgram( program );
             m_testSubject.runProgram();
             expect( m_mockStdOut.outputs ).to.eql( [0] );
@@ -182,7 +182,7 @@ describe( 'IntCodeComputer', () =>
         it( 'Less-than, immediate mode, true', () =>
         {
             const program = [3, 3, 1107, -1, 8, 3, 4, 3, 99];
-            m_mockStdIn.setInput( 7 );
+            m_mockStdIn.setInput( [7] );
             m_testSubject.loadProgram( program );
             m_testSubject.runProgram();
             expect( m_mockStdOut.outputs ).to.eql( [1] );
@@ -191,7 +191,7 @@ describe( 'IntCodeComputer', () =>
         it( 'Jump, position mode, output 0 if input 0, true', () =>
         {
             const program = [3, 12, 6, 12, 15, 1, 13, 14, 13, 4, 13, 99, -1, 0, 1, 9];
-            m_mockStdIn.setInput( 0 );
+            m_mockStdIn.setInput( [0] );
             m_testSubject.loadProgram( program );
             m_testSubject.runProgram();
             expect( m_mockStdOut.outputs ).to.eql( [0] );
@@ -200,7 +200,7 @@ describe( 'IntCodeComputer', () =>
         it( 'Jump, position mode, output 0 if input 0, false', () =>
         {
             const program = [3, 12, 6, 12, 15, 1, 13, 14, 13, 4, 13, 99, -1, 0, 1, 9];
-            m_mockStdIn.setInput( -1 );
+            m_mockStdIn.setInput( [-1] );
             m_testSubject.loadProgram( program );
             m_testSubject.runProgram();
             expect( m_mockStdOut.outputs ).to.eql( [1] );
@@ -209,7 +209,7 @@ describe( 'IntCodeComputer', () =>
         it( 'Jump, immediate mode, output 0 if input 0, true', () =>
         {
             const program = [3, 3, 1105, -1, 9, 1101, 0, 0, 12, 4, 12, 99, 1];
-            m_mockStdIn.setInput( 0 );
+            m_mockStdIn.setInput( [0] );
             m_testSubject.loadProgram( program );
             m_testSubject.runProgram();
             expect( m_mockStdOut.outputs ).to.eql( [0] );
@@ -218,7 +218,7 @@ describe( 'IntCodeComputer', () =>
         it( 'Jump, immediate mode, output 0 if input 0, false', () =>
         {
             const program = [3, 3, 1105, -1, 9, 1101, 0, 0, 12, 4, 12, 99, 1];
-            m_mockStdIn.setInput( 10 );
+            m_mockStdIn.setInput( [10] );
             m_testSubject.loadProgram( program );
             m_testSubject.runProgram();
             expect( m_mockStdOut.outputs ).to.eql( [1] );
@@ -229,7 +229,7 @@ describe( 'IntCodeComputer', () =>
             const program = [3, 21, 1008, 21, 8, 20, 1005, 20, 22, 107, 8, 21, 20, 1006, 20, 31,
                 1106, 0, 36, 98, 0, 0, 1002, 21, 125, 20, 4, 20, 1105, 1, 46, 104,
                 999, 1105, 1, 46, 1101, 1000, 1, 20, 4, 20, 1105, 1, 46, 98, 99];
-            m_mockStdIn.setInput( 7 );
+            m_mockStdIn.setInput( [7] );
             m_testSubject.loadProgram( program );
             m_testSubject.runProgram();
             expect( m_mockStdOut.outputs ).to.eql( [999] );
@@ -240,7 +240,7 @@ describe( 'IntCodeComputer', () =>
             const program = [3, 21, 1008, 21, 8, 20, 1005, 20, 22, 107, 8, 21, 20, 1006, 20, 31,
                 1106, 0, 36, 98, 0, 0, 1002, 21, 125, 20, 4, 20, 1105, 1, 46, 104,
                 999, 1105, 1, 46, 1101, 1000, 1, 20, 4, 20, 1105, 1, 46, 98, 99];
-            m_mockStdIn.setInput( 8 );
+            m_mockStdIn.setInput( [8] );
             m_testSubject.loadProgram( program );
             m_testSubject.runProgram();
             expect( m_mockStdOut.outputs ).to.eql( [1000] );
@@ -251,10 +251,34 @@ describe( 'IntCodeComputer', () =>
             const program = [3, 21, 1008, 21, 8, 20, 1005, 20, 22, 107, 8, 21, 20, 1006, 20, 31,
                 1106, 0, 36, 98, 0, 0, 1002, 21, 125, 20, 4, 20, 1105, 1, 46, 104,
                 999, 1105, 1, 46, 1101, 1000, 1, 20, 4, 20, 1105, 1, 46, 98, 99];
-            m_mockStdIn.setInput( 9 );
+            m_mockStdIn.setInput( [9] );
             m_testSubject.loadProgram( program );
             m_testSubject.runProgram();
             expect( m_mockStdOut.outputs ).to.eql( [1001] );
+        } );
+
+        it( 'Sample program from problem 7, A = 0, B = 0', () =>
+        {
+            const program = [3, 15, 3, 16, 1002, 16, 10, 16, 1, 16, 15, 15, 4, 15, 99, 0, 0];
+            // B = (B*10)
+            // A = A + B
+            // print(A)
+            m_mockStdIn.setInput( [0, 0] );
+            m_testSubject.loadProgram( program );
+            m_testSubject.runProgram();
+            expect( m_mockStdOut.outputs ).to.eql( [0] );
+        } );
+
+        it( 'Sample program from problem 7, A = 7, B = 11', () =>
+        {
+            const program = [3, 15, 3, 16, 1002, 16, 10, 16, 1, 16, 15, 15, 4, 15, 99, 0, 0];
+            // input = (input*10)
+            // phase = phase + input
+            // print(phase)
+            m_mockStdIn.setInput( [7, 11] );
+            m_testSubject.loadProgram( program );
+            m_testSubject.runProgram();
+            expect( m_mockStdOut.outputs ).to.eql( [117] );
         } );
     } );
 } );

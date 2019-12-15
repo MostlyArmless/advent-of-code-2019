@@ -2,20 +2,25 @@ import { IStdIn } from "../interfaces";
 
 export class MockStdIn implements IStdIn
 {
-    value: number;
+    values: number[];
+    index: number;
 
-    constructor( numberToYield: number )
+    constructor( numbersToYield: number[] )
     {
-        this.value = numberToYield;
+        this.values = numbersToYield;
+        this.index = 0;
     }
 
-    setInput( nextValue: number ): void
+    setInput( numbersToYield: number[] ): void
     {
-        this.value = nextValue;
+        this.values = numbersToYield;
+        this.index = 0;
     }
 
     getInput(): number
     {
-        return this.value;
+        const nextNumber = this.values[this.index];
+        this.index += 1;
+        return nextNumber;
     }
 }

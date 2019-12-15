@@ -199,6 +199,9 @@ export class IntCodeComputer
     private ReadFromStdIn( resultAddress ): void
     {
         const input = this.stdIn.getInput();
+        if ( input === undefined || input === null || isNaN( input ) )
+            throw new Error( "Failed to read a value from STDIN!" );
+
         this.log( `Storing value ${input} at address ${resultAddress}` );
         this.memory[resultAddress] = input;
     }
@@ -252,12 +255,28 @@ export class IntCodeComputer
         while ( this.shouldContinue )
         {
             this.runNextInstruction();
+            // TODO - disable this for performance
+            if ( !this.validateMemory() )
+            {
+                throw new Error( `Memory state invalid!` );
+            }
         }
 
         this.log( `Finished running after ${this.numInstructionsProcessed} steps.` );
         this.log( `Final memory state = ${this.memory}` );
         this.log( `Result = ${this.memory[0]}` );
         return this.memory[0];
+    }
+
+    validateMemory(): boolean
+    {
+        for ( let i = 0; i < this.memory.length; i++ )
+        {
+            if ( isNaN( this.memory[i] ) )
+                return false;
+        }
+
+        return true;
     }
 
     clearMemory(): void
