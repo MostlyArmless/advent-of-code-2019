@@ -105,3 +105,14 @@ export function allPermutations( arr: any[] ): any[]
     }
     return ret;
 }
+
+export function NumToBigInt( arr: number[] ): bigint[]
+{
+    let output: bigint[] = [];
+    arr.forEach( elem =>
+    {
+        output.push( BigInt( elem ) );
+    } );
+
+    return output;
+}

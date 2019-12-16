@@ -1,15 +1,15 @@
 import { IStdOut } from "../interfaces";
 
-export class MockStdOut implements IStdOut
+export class MockStdOut<T> implements IStdOut<T>
 {
-    outputs: number[];
+    outputs: T[];
 
     constructor()
     {
         this.outputs = [];
     }
 
-    sendOutput( value: number ): void
+    sendOutput( value: T ): void
     {
         console.log( `MOCK STDOUT: ${value}` );
         this.outputs.push( value );

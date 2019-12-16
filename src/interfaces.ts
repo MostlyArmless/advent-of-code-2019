@@ -1,9 +1,9 @@
-export interface IStdIn
+export interface IStdIn<T>
 {
-    getInput(): Promise<number>;
+    getInput(): Promise<T>;
 }
 
-export interface IStdOut
+export interface IStdOut<T>
 {
-    sendOutput( value: number ): void;
+    sendOutput( value: T ): void;
 }

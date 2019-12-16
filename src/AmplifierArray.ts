@@ -1,22 +1,23 @@
 import { Amplifier } from "./Amplifier";
 import { IoBuffer } from "./IoBuffer";
-import { allPermutations } from "./tools";
+import { allPermutations, NumToBigInt } from "./tools";
 
 export type ConnectionMode = 'serial' | 'feedback';
 
 export class AmplifierArray
 {
-    program: number[];
+    program: bigint[];
     amps: Amplifier[];
     phaseSequence: number[];
-    inputBuffer: IoBuffer;
-    outputBuffer: IoBuffer;
+    inputBuffer: IoBuffer<bigint>;
+    outputBuffer: IoBuffer<bigint>;
     enableLogging: boolean;
     connectionMode: ConnectionMode;
 
-    constructor( numAmplifiers, connectionMode: ConnectionMode, program: number[], enableLogging: boolean )
+    constructor( numAmplifiers, connectionMode: ConnectionMode, program: bigint[] | number[], enableLogging: boolean )
     {
-        this.program = program;
+
+        this.program = typeof program[0] === 'bigint' ? program as bigint[] : NumToBigInt( program as number[] );
         this.enableLogging = enableLogging;
 
         this.inputBuffer = new IoBuffer();
@@ -25,10 +26,10 @@ export class AmplifierArray
         this.connectionMode = connectionMode;
 
         this.amps = [];
-        this.connectAmplifiers( connectionMode, numAmplifiers, program, enableLogging );
+        this.connectAmplifiers( connectionMode, numAmplifiers, this.program, enableLogging );
     }
 
-    private connectAmplifiers( connectionMode: ConnectionMode, numAmplifiers: number, program: number[], enableLogging: boolean )
+    private connectAmplifiers( connectionMode: ConnectionMode, numAmplifiers: number, program: bigint[], enableLogging: boolean )
     {
         let firstAmplifierInput = connectionMode === 'serial' ? this.inputBuffer : this.outputBuffer;
 
@@ -36,7 +37,7 @@ export class AmplifierArray
         for ( let i = 0; i < numAmplifiers; i++ )
         {
             const inputBuffer = i === 0 ? firstAmplifierInput : this.amps[i - 1].outputBuffer;
-            const outputBuffer = i === finalAmplifier ? this.outputBuffer : new IoBuffer();
+            const outputBuffer = i === finalAmplifier ? this.outputBuffer : new IoBuffer<bigint>();
             this.amps.push( new Amplifier( program, inputBuffer, outputBuffer, enableLogging, i ) );
         }
     }
@@ -48,7 +49,7 @@ export class AmplifierArray
         this.outputBuffer.clear();
     }
 
-    loadPhaseSequence( phaseSequence: number[] ): void
+    loadPhaseSequence( phaseSequence: bigint[] ): void
     {
         if ( phaseSequence.length !== this.amps.length )
             throw new Error( `Phase sequence length ${phaseSequence.length} does not match the number of amplifiers in ampArray ${this.amps.length}` );
@@ -59,7 +60,7 @@ export class AmplifierArray
         }
     }
 
-    async runAmplifierProgram( inputSignal: number ): Promise<number>
+    async runAmplifierProgram( inputSignal: number ): Promise<bigint>
     {
         this.loadInput( inputSignal );
         this.log( 'BEFORE:' );
@@ -86,10 +87,12 @@ export class AmplifierArray
         switch ( this.connectionMode )
         {
             case 'serial':
-                this.inputBuffer.queue.pushBack( inputSignal );
+                this.inputBuffer.queue.pushBack( BigInt( inputSignal ) );
                 break;
+
             case 'feedback':
-                this.outputBuffer.queue.pushBack( inputSignal );
+                this.outputBuffer.queue.pushBack( BigInt( inputSignal ) );
+                break;
         }
     }
 
@@ -110,7 +113,7 @@ export class AmplifierArray
     async findMaxPossibleOutput( inputSignal: number )
     {
         const numAmplifiers = this.amps.length;
-        let maxOutput = Number.MIN_SAFE_INTEGER;
+        let maxOutput = BigInt( Number.MIN_SAFE_INTEGER );
         let uniquePhaseNumbers = this.getPhaseNumbers( numAmplifiers, this.connectionMode );
         const allPossiblePhaseSequences = allPermutations( uniquePhaseNumbers );
         this.log( `Finding maximum possible engine output...` );
@@ -147,12 +150,12 @@ export class AmplifierArray
         return uniquePhaseNumbers;
     }
 
-    sendInput( value: number ): void
+    sendInput( value: bigint ): void
     {
         this.inputBuffer.queue.pushBack( value );
     }
 
-    async getOutput(): Promise<number>
+    async getOutput(): Promise<bigint>
     {
         return await this.outputBuffer.queue.popFront();
     }

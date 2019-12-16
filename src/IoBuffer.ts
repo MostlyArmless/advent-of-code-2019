@@ -1,21 +1,21 @@
 import { IStdIn, IStdOut } from './interfaces';
 import { Queue } from './Queue';
 
-export class IoBuffer implements IStdIn, IStdOut
+export class IoBuffer<T> implements IStdIn<T>, IStdOut<T>
 {
-    queue: Queue;
+    queue: Queue<T>;
 
     constructor()
     {
         this.queue = new Queue();
     }
 
-    async getInput(): Promise<number>
+    async getInput(): Promise<T>
     {
         return await this.queue.popFront();
     }
 
-    sendOutput( value: number ): void
+    sendOutput( value: T ): void
     {
         this.queue.pushBack( value );
     }

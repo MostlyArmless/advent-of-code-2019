@@ -9,7 +9,7 @@ const enableLogging = false;
 
 function problem5a()
 {
-    const airConditionerSystemId = 1;
+    const airConditionerSystemId = 1n;
     const mockStdOut = new MockStdOut();
     const computer = new IntCodeComputer(
         new MockStdIn( [airConditionerSystemId] ),
@@ -23,7 +23,7 @@ function problem5a()
 
 function problem5b()
 {
-    const thermalRadiatorControllerId = 5;
+    const thermalRadiatorControllerId = 5n;
     const mockStdOut = new MockStdOut();
     const computer = new IntCodeComputer(
         new MockStdIn( [thermalRadiatorControllerId] ),

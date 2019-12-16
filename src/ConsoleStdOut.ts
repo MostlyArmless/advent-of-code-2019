@@ -1,8 +1,8 @@
 import { IStdOut } from "./interfaces";
 
-export class ConsoleStdOut implements IStdOut
+export class ConsoleStdOut<T> implements IStdOut<T>
 {
-    sendOutput( value: number ): void
+    sendOutput( value: T ): void
     {
         console.log( `STDOUT: ${value}` );
     }

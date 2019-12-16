@@ -1,17 +1,17 @@
-export class Queue
+export class Queue<T>
 {
-    values: number[]
+    values: T[]
     constructor()
     {
         this.values = [];
     }
 
-    pushBack( value: number )
+    pushBack( value: T )
     {
         this.values.unshift( value );
     }
 
-    async popFront(): Promise<number>
+    async popFront(): Promise<T>
     {
         // If there are values, pop the next one immediately, otherwise set a timeout and check again later (waiting for new values to be pushed)
         await this.waitForValues();

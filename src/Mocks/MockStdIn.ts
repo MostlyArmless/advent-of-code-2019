@@ -1,23 +1,23 @@
 import { IStdIn } from "../interfaces";
 
-export class MockStdIn implements IStdIn
+export class MockStdIn<T> implements IStdIn<T>
 {
-    values: number[];
+    values: T[];
     index: number;
 
-    constructor( numbersToYield: number[] )
+    constructor( numbersToYield: T[] )
     {
         this.values = numbersToYield;
         this.index = 0;
     }
 
-    setInput( numbersToYield: number[] ): void
+    setInput( numbersToYield: T[] ): void
     {
         this.values = numbersToYield;
         this.index = 0;
     }
 
-    async getInput(): Promise<number>
+    async getInput(): Promise<T>
     {
         const nextNumber = this.values[this.index];
         this.index += 1;

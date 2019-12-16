@@ -12,8 +12,8 @@ chai.use( require( 'chai-string' ) ); // Extension that provides the "string sho
 describe( 'IntCodeComputer', () =>
 {
     const enableLogging = true;
-    let m_mockStdIn: MockStdIn;
-    let m_mockStdOut: MockStdOut;
+    let m_mockStdIn: MockStdIn<bigint>;
+    let m_mockStdOut: MockStdOut<bigint>;
     let m_testSubject: IntCodeComputer;
 
     beforeEach( () =>
@@ -31,7 +31,7 @@ describe( 'IntCodeComputer', () =>
             const expectedMemoryState = [1, 0, 0, 2, 99];
             m_testSubject.loadProgram( program );
             await m_testSubject.runProgram();
-            expect( m_testSubject.dumpMemory() ).to.eql( expectedMemoryState );
+            expect( m_testSubject.dumpMemoryAsNumbers() ).to.eql( expectedMemoryState );
         } );
 
         it( 'ADD and MULTIPLY', async () =>
@@ -40,7 +40,7 @@ describe( 'IntCodeComputer', () =>
             const expectedMemoryState = [3500, 9, 10, 70, 2, 3, 11, 0, 99, 30, 40, 50];
             m_testSubject.loadProgram( program );
             await m_testSubject.runProgram();
-            expect( m_testSubject.dumpMemory() ).to.eql( expectedMemoryState );
+            expect( m_testSubject.dumpMemoryAsNumbers() ).to.eql( expectedMemoryState );
         } );
 
         it( 'ADD and store result at 0', async () =>
@@ -49,7 +49,7 @@ describe( 'IntCodeComputer', () =>
             const expectedMemoryState = [2, 0, 0, 0, 99];
             m_testSubject.loadProgram( program );
             await m_testSubject.runProgram();
-            expect( m_testSubject.dumpMemory() ).to.eql( expectedMemoryState );
+            expect( m_testSubject.dumpMemoryAsNumbers() ).to.eql( expectedMemoryState );
         } );
 
         it( 'MULTIPLY and store at 3', async () =>
@@ -58,7 +58,7 @@ describe( 'IntCodeComputer', () =>
             const expectedMemoryState = [2, 3, 0, 6, 99];
             m_testSubject.loadProgram( program );
             await m_testSubject.runProgram();
-            expect( m_testSubject.dumpMemory() ).to.eql( expectedMemoryState );
+            expect( m_testSubject.dumpMemoryAsNumbers() ).to.eql( expectedMemoryState );
         } );
 
         it( 'MULTIPLY and store at 5', async () =>
@@ -67,7 +67,7 @@ describe( 'IntCodeComputer', () =>
             const expectedMemoryState = [2, 4, 4, 5, 99, 9801];
             m_testSubject.loadProgram( program );
             await m_testSubject.runProgram();
-            expect( m_testSubject.dumpMemory() ).to.eql( expectedMemoryState );
+            expect( m_testSubject.dumpMemoryAsNumbers() ).to.eql( expectedMemoryState );
         } );
 
         it( 'ADD and return before end of program memory', async () =>
@@ -76,7 +76,7 @@ describe( 'IntCodeComputer', () =>
             const expectedMemoryState = [30, 1, 1, 4, 2, 5, 6, 0, 99];
             m_testSubject.loadProgram( program );
             await m_testSubject.runProgram();
-            expect( m_testSubject.dumpMemory() ).to.eql( expectedMemoryState );
+            expect( m_testSubject.dumpMemoryAsNumbers() ).to.eql( expectedMemoryState );
         } );
 
         it( 'length-4 MULTIPLY opstring', async () =>
@@ -85,7 +85,7 @@ describe( 'IntCodeComputer', () =>
             const expectedMemoryState = [1002, 4, 3, 4, 99];
             m_testSubject.loadProgram( program );
             await m_testSubject.runProgram();
-            expect( m_testSubject.dumpMemory() ).to.eql( expectedMemoryState );
+            expect( m_testSubject.dumpMemoryAsNumbers() ).to.eql( expectedMemoryState );
         } );
 
         it( 'length 4 ADD opstring', async () =>
@@ -94,7 +94,7 @@ describe( 'IntCodeComputer', () =>
             const expectedMemoryState = [1101, 100, -1, 4, 99];
             m_testSubject.loadProgram( program );
             await m_testSubject.runProgram();
-            expect( m_testSubject.dumpMemory() ).to.eql( expectedMemoryState );
+            expect( m_testSubject.dumpMemoryAsNumbers() ).to.eql( expectedMemoryState );
         } );
     } );
 
@@ -102,7 +102,7 @@ describe( 'IntCodeComputer', () =>
     {
         it( 'Take input number and print it', async () =>
         {
-            const inputValue = 69;
+            const inputValue = 69n;
             const mockInputRetriever = new MockStdIn( [inputValue] );
             const mockStdOut = new MockStdOut();
             let m_testSubject = new IntCodeComputer( mockInputRetriever, mockStdOut, enableLogging );
@@ -119,7 +119,7 @@ describe( 'IntCodeComputer', () =>
         it( 'Equality, position mode, true', async () =>
         {
             const program = [3, 9, 8, 9, 10, 9, 4, 9, 99, -1, 8];
-            m_mockStdIn.setInput( [8] );
+            m_mockStdIn.setInput( [8n] );
             m_testSubject.loadProgram( program );
             await m_testSubject.runProgram();
             expect( m_mockStdOut.outputs ).to.eql( [1] );
@@ -128,7 +128,7 @@ describe( 'IntCodeComputer', () =>
         it( 'Equality, position mode, false', async () =>
         {
             const program = [3, 9, 8, 9, 10, 9, 4, 9, 99, -1, 8];
-            m_mockStdIn.setInput( [7] );
+            m_mockStdIn.setInput( [7n] );
             m_testSubject.loadProgram( program );
             await m_testSubject.runProgram();
             expect( m_mockStdOut.outputs ).to.eql( [0] );
@@ -137,7 +137,7 @@ describe( 'IntCodeComputer', () =>
         it( 'Less-than, position mode, false', async () =>
         {
             const program = [3, 9, 7, 9, 10, 9, 4, 9, 99, -1, 8];
-            m_mockStdIn.setInput( [9] );
+            m_mockStdIn.setInput( [9n] );
             m_testSubject.loadProgram( program );
             await m_testSubject.runProgram();
             expect( m_mockStdOut.outputs ).to.eql( [0] );
@@ -146,7 +146,7 @@ describe( 'IntCodeComputer', () =>
         it( 'Less-than, position mode, true', async () =>
         {
             const program = [3, 9, 7, 9, 10, 9, 4, 9, 99, -1, 8];
-            m_mockStdIn.setInput( [7] );
+            m_mockStdIn.setInput( [7n] );
             m_testSubject.loadProgram( program );
             await m_testSubject.runProgram();
             expect( m_mockStdOut.outputs ).to.eql( [1] );
@@ -155,7 +155,7 @@ describe( 'IntCodeComputer', () =>
         it( 'Equal, immediate mode, false', async () =>
         {
             const program = [3, 3, 1108, -1, 8, 3, 4, 3, 99];
-            m_mockStdIn.setInput( [7] );
+            m_mockStdIn.setInput( [7n] );
             m_testSubject.loadProgram( program );
             await m_testSubject.runProgram();
             expect( m_mockStdOut.outputs ).to.eql( [0] );
@@ -164,7 +164,7 @@ describe( 'IntCodeComputer', () =>
         it( 'Equal, immediate mode, true', async () =>
         {
             const program = [3, 3, 1108, -1, 8, 3, 4, 3, 99];
-            m_mockStdIn.setInput( [8] );
+            m_mockStdIn.setInput( [8n] );
             m_testSubject.loadProgram( program );
             await m_testSubject.runProgram();
             expect( m_mockStdOut.outputs ).to.eql( [1] );
@@ -173,7 +173,7 @@ describe( 'IntCodeComputer', () =>
         it( 'Less-than, immediate mode, false', async () =>
         {
             const program = [3, 3, 1107, -1, 8, 3, 4, 3, 99];
-            m_mockStdIn.setInput( [10] );
+            m_mockStdIn.setInput( [10n] );
             m_testSubject.loadProgram( program );
             await m_testSubject.runProgram();
             expect( m_mockStdOut.outputs ).to.eql( [0] );
@@ -182,7 +182,7 @@ describe( 'IntCodeComputer', () =>
         it( 'Less-than, immediate mode, true', async () =>
         {
             const program = [3, 3, 1107, -1, 8, 3, 4, 3, 99];
-            m_mockStdIn.setInput( [7] );
+            m_mockStdIn.setInput( [7n] );
             m_testSubject.loadProgram( program );
             await m_testSubject.runProgram();
             expect( m_mockStdOut.outputs ).to.eql( [1] );
@@ -191,7 +191,7 @@ describe( 'IntCodeComputer', () =>
         it( 'Jump, position mode, output 0 if input 0, true', async () =>
         {
             const program = [3, 12, 6, 12, 15, 1, 13, 14, 13, 4, 13, 99, -1, 0, 1, 9];
-            m_mockStdIn.setInput( [0] );
+            m_mockStdIn.setInput( [0n] );
             m_testSubject.loadProgram( program );
             await m_testSubject.runProgram();
             expect( m_mockStdOut.outputs ).to.eql( [0] );
@@ -200,7 +200,7 @@ describe( 'IntCodeComputer', () =>
         it( 'Jump, position mode, output 0 if input 0, false', async () =>
         {
             const program = [3, 12, 6, 12, 15, 1, 13, 14, 13, 4, 13, 99, -1, 0, 1, 9];
-            m_mockStdIn.setInput( [-1] );
+            m_mockStdIn.setInput( [-1n] );
             m_testSubject.loadProgram( program );
             await m_testSubject.runProgram();
             expect( m_mockStdOut.outputs ).to.eql( [1] );
@@ -209,7 +209,7 @@ describe( 'IntCodeComputer', () =>
         it( 'Jump, immediate mode, output 0 if input 0, true', async () =>
         {
             const program = [3, 3, 1105, -1, 9, 1101, 0, 0, 12, 4, 12, 99, 1];
-            m_mockStdIn.setInput( [0] );
+            m_mockStdIn.setInput( [0n] );
             m_testSubject.loadProgram( program );
             await m_testSubject.runProgram();
             expect( m_mockStdOut.outputs ).to.eql( [0] );
@@ -218,7 +218,7 @@ describe( 'IntCodeComputer', () =>
         it( 'Jump, immediate mode, output 0 if input 0, false', async () =>
         {
             const program = [3, 3, 1105, -1, 9, 1101, 0, 0, 12, 4, 12, 99, 1];
-            m_mockStdIn.setInput( [10] );
+            m_mockStdIn.setInput( [10n] );
             m_testSubject.loadProgram( program );
             await m_testSubject.runProgram();
             expect( m_mockStdOut.outputs ).to.eql( [1] );
@@ -229,7 +229,7 @@ describe( 'IntCodeComputer', () =>
             const program = [3, 21, 1008, 21, 8, 20, 1005, 20, 22, 107, 8, 21, 20, 1006, 20, 31,
                 1106, 0, 36, 98, 0, 0, 1002, 21, 125, 20, 4, 20, 1105, 1, 46, 104,
                 999, 1105, 1, 46, 1101, 1000, 1, 20, 4, 20, 1105, 1, 46, 98, 99];
-            m_mockStdIn.setInput( [7] );
+            m_mockStdIn.setInput( [7n] );
             m_testSubject.loadProgram( program );
             await m_testSubject.runProgram();
             expect( m_mockStdOut.outputs ).to.eql( [999] );
@@ -240,7 +240,7 @@ describe( 'IntCodeComputer', () =>
             const program = [3, 21, 1008, 21, 8, 20, 1005, 20, 22, 107, 8, 21, 20, 1006, 20, 31,
                 1106, 0, 36, 98, 0, 0, 1002, 21, 125, 20, 4, 20, 1105, 1, 46, 104,
                 999, 1105, 1, 46, 1101, 1000, 1, 20, 4, 20, 1105, 1, 46, 98, 99];
-            m_mockStdIn.setInput( [8] );
+            m_mockStdIn.setInput( [8n] );
             m_testSubject.loadProgram( program );
             await m_testSubject.runProgram();
             expect( m_mockStdOut.outputs ).to.eql( [1000] );
@@ -251,7 +251,7 @@ describe( 'IntCodeComputer', () =>
             const program = [3, 21, 1008, 21, 8, 20, 1005, 20, 22, 107, 8, 21, 20, 1006, 20, 31,
                 1106, 0, 36, 98, 0, 0, 1002, 21, 125, 20, 4, 20, 1105, 1, 46, 104,
                 999, 1105, 1, 46, 1101, 1000, 1, 20, 4, 20, 1105, 1, 46, 98, 99];
-            m_mockStdIn.setInput( [9] );
+            m_mockStdIn.setInput( [9n] );
             m_testSubject.loadProgram( program );
             await m_testSubject.runProgram();
             expect( m_mockStdOut.outputs ).to.eql( [1001] );
@@ -263,7 +263,7 @@ describe( 'IntCodeComputer', () =>
             // B = (B*10)
             // A = A + B
             // print(A)
-            m_mockStdIn.setInput( [0, 0] );
+            m_mockStdIn.setInput( [0n, 0n] );
             m_testSubject.loadProgram( program );
             await m_testSubject.runProgram();
             expect( m_mockStdOut.outputs ).to.eql( [0] );
@@ -275,10 +275,31 @@ describe( 'IntCodeComputer', () =>
             // input = (input*10)
             // phase = phase + input
             // print(phase)
-            m_mockStdIn.setInput( [7, 11] );
+            m_mockStdIn.setInput( [7n, 11n] );
             m_testSubject.loadProgram( program );
             await m_testSubject.runProgram();
             expect( m_mockStdOut.outputs ).to.eql( [117] );
+        } );
+    } );
+
+    describe( 'RelativeOffset', () =>
+    {
+        it( 'Program that prints itself', () =>
+        {
+            const program = [109, 1, 204, -1, 1001, 100, 1, 100, 1008, 100, 16, 101, 1006, 101, 0, 99];
+            m_testSubject.loadProgram( program );
+
+            m_testSubject.runProgram();
+            expect( m_mockStdOut.outputs ).to.eql( program );
+        } );
+
+        it( 'Output 16 digit number', async () =>
+        {
+            const program = [1102, 34915192, 34915192, 7, 4, 7, 99, 0];
+
+            m_testSubject.loadProgram( program );
+            const output = await ( await m_testSubject.runProgram() ).toString();
+            expect( output.length ).to.equal( 16 );
         } );
     } );
 } );

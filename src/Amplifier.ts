@@ -4,13 +4,13 @@ import { IoBuffer } from "./IoBuffer";
 export class Amplifier
 {
     computer: IntCodeComputer;
-    program: number[];
-    outputBuffer: IoBuffer;
-    inputBuffer: IoBuffer;
+    program: bigint[];
+    outputBuffer: IoBuffer<bigint>;
+    inputBuffer: IoBuffer<bigint>;
     enableLogging: boolean;
     iAmp: number;
 
-    constructor( program: number[], inputBuffer: IoBuffer, outputBuffer: IoBuffer, enableLogging: boolean, iAmp: number )
+    constructor( program: bigint[], inputBuffer: IoBuffer<bigint>, outputBuffer: IoBuffer<bigint>, enableLogging: boolean, iAmp: number )
     {
         this.enableLogging = enableLogging;
         this.inputBuffer = inputBuffer;
@@ -29,12 +29,12 @@ export class Amplifier
         this.outputBuffer.clear();
     }
 
-    setPhase( phaseValue: number ): void
+    setPhase( phaseValue: bigint ): void
     {
         this.inputBuffer.queue.pushBack( phaseValue );
     }
 
-    async runProgram(): Promise<number>
+    async runProgram(): Promise<bigint>
     {
         return await this.computer.runProgram();
     }

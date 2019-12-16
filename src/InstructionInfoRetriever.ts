@@ -4,13 +4,13 @@ export interface InstructionInfo
 {
     numParams: number;
     storesResult: boolean;
-    resultOffset: number | null;
+    resultOffset: bigint | null;
     instructionLength: number;
 }
 
 export function GetInstructionInfo( opCode: OpCode ): InstructionInfo
 {
-    let instructionInfo = {
+    let instructionInfo: InstructionInfo = {
         numParams: 0,
         storesResult: false,
         resultOffset: null,
@@ -23,14 +23,14 @@ export function GetInstructionInfo( opCode: OpCode ): InstructionInfo
         case OpCode.Multiply:
             instructionInfo.numParams = 2;
             instructionInfo.storesResult = true;
-            instructionInfo.resultOffset = instructionInfo.numParams + 1;
+            instructionInfo.resultOffset = BigInt( instructionInfo.numParams + 1 );
             instructionInfo.instructionLength = 4;
             break;
 
         case OpCode.StdIn:
             instructionInfo.numParams = 1;
             instructionInfo.storesResult = true;
-            instructionInfo.resultOffset = instructionInfo.numParams;
+            instructionInfo.resultOffset = BigInt( instructionInfo.numParams );
             instructionInfo.instructionLength = 2;
             break;
 
@@ -55,14 +55,14 @@ export function GetInstructionInfo( opCode: OpCode ): InstructionInfo
         case OpCode.LessThan:
             instructionInfo.numParams = 2;
             instructionInfo.storesResult = true;
-            instructionInfo.resultOffset = instructionInfo.numParams + 1;
+            instructionInfo.resultOffset = BigInt( instructionInfo.numParams + 1 );
             instructionInfo.instructionLength = 4;
             break;
 
         case OpCode.Equals:
             instructionInfo.numParams = 2;
             instructionInfo.storesResult = true;
-            instructionInfo.resultOffset = instructionInfo.numParams + 1;
+            instructionInfo.resultOffset = BigInt( instructionInfo.numParams + 1 );
             instructionInfo.instructionLength = 4;
             break;
 

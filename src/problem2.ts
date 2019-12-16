@@ -14,8 +14,8 @@ async function problem2()
         enableLogging );
 
     // Determine what pair of inputs produces the output:
-    const desiredOutput = 19690720;
-    let actualOutput = 0;
+    const desiredOutput = 19690720n;
+    let actualOutput = 0n;
     let arg1 = 100;
     let arg2 = 99;
     let numAttempts = 0;

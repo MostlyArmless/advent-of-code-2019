@@ -1,10 +1,10 @@
 import { IStdIn } from "./interfaces";
 import * as readline from 'readline-sync';
 
-export class HumanInputRetriever implements IStdIn
+export class HumanInputRetriever implements IStdIn<bigint>
 {
-    async getInput(): Promise<number>
+    async getInput(): Promise<bigint>
     {
-        return parseInt( readline.question( 'Enter a number: ' ) );
+        return BigInt( readline.question( 'Enter a number: ' ) );
     }
 }
