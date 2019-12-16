@@ -1,8 +1,16 @@
 import { LayerInfo } from "./LayerInfo";
-import { blankGrid } from "./Grid";
+import { blankGrid, copyGrid } from "./Grid";
+import * as fs from 'fs';
 
 type Row = number[];
 type Layer = Row[];
+
+enum Pixel
+{
+    Black = 0,
+    White = 1,
+    Transparent = 2
+}
 
 export class ImageDecoder
 {
@@ -108,5 +116,57 @@ export class ImageDecoder
         }
 
         return this.layerInfo[layerWithFewestZeros].ones * this.layerInfo[layerWithFewestZeros].twos;
+    }
+
+    private compileLayers(): number[][]
+    {
+        const iTopLayer = 0;
+        let canvas = copyGrid( this.layers[iTopLayer] );
+
+        for ( let iRow = 0; iRow < this.numRows; iRow++ )
+        {
+            for ( let iCol = 0; iCol < this.numCols; iCol++ )
+            {
+                if ( canvas[iRow][iCol] !== Pixel.Transparent )
+                    continue;
+
+                // This pixel is transparent, so go down through the layers till you find a non-transparent pixel to use instead
+                for ( let iLayer = iTopLayer; iLayer < this.numLayers; iLayer++ )
+                {
+                    if ( this.layers[iLayer][iRow][iCol] !== Pixel.Transparent )
+                    {
+                        canvas[iRow][iCol] = this.layers[iLayer][iRow][iCol];
+                        break;
+                    }
+                }
+            }
+        }
+
+        return canvas;
+    }
+
+    saveImageToFile(): void
+    {
+        const canvas = this.compileLayers();
+
+        const str = this.layerToString( canvas );
+
+        fs.writeFileSync( './problem8b.txt', str );
+    }
+
+    private layerToString( canvas: number[][] ): string
+    {
+        let str: string = '';
+        canvas.forEach( row =>
+        {
+            str += row.toString().replace( /0/g, 'X' ).replace( /1/g, '_' ) + '\n';
+        } );
+        return str;
+    }
+
+    printLayer( iLayer: number ): void
+    {
+        const str = this.layerToString( this.layers[iLayer] );
+        fs.writeFileSync( `./layer${iLayer}.txt`, str );
     }
 }
