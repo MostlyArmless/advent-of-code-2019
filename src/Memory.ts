@@ -1,7 +1,7 @@
 export class Memory
 {
-    ram: bigint[]; // Use an array to store values where the address can be indexed by a normal Number
-    bigram: Map<bigint, bigint>; // Use a map to index those addresses which can only be expressed as a bigint
+    private ram: bigint[]; // Use an array to store values where the address can be indexed by a normal Number
+    private bigram: Map<bigint, bigint>; // Use a map to index those addresses which can only be expressed as a bigint
 
     constructor()
     {

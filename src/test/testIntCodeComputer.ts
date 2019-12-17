@@ -1,13 +1,8 @@
 // Test framework dependencies
-// const should = require('chai').should();
 const expect = require( 'chai' ).expect;
-// const assert = require('chai').assert;
-import * as chai from 'chai';
 import { IntCodeComputer } from '../IntCodeComputer';
 import { MockStdIn } from '../Mocks/MockStdIn';
 import { MockStdOut } from '../Mocks/MockStdOut';
-chai.use( require( 'chai-as-promised' ) ); // Extension that defines the "eventually" keyword
-chai.use( require( 'chai-string' ) ); // Extension that provides the "string should contain" functionality
 
 describe( 'IntCodeComputer', () =>
 {

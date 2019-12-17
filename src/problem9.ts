@@ -1,8 +1,8 @@
 import { measureExecutionTime } from "./tools";
 
-function problem8a()
+function problem9a()
 {
 
 }
 
-measureExecutionTime( problem8a );
+measureExecutionTime( problem9a );

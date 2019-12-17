@@ -277,7 +277,7 @@ export class IntCodeComputer
         }
 
         this.log( `Finished running after ${this.numInstructionsProcessed} steps.` );
-        this.log( `Final memory state = ${this.memory}` );
+        this.log( `Final memory state = ${this.memory.dumpRamOnly()}` );
         this.log( `Result = ${this.memory.load( 0n )}` );
         return this.memory.load( 0n );
     }
