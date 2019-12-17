@@ -44,7 +44,9 @@ export class Memory
         {
             this.ram[Number( address )] = value;
         }
-
-        this.bigram.set( address, value );
+        else
+        {
+            this.bigram.set( address, value );
+        }
     }
 }
