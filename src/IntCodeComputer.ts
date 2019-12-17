@@ -23,7 +23,7 @@ export enum OpCode
     End = 99
 }
 
-interface Instruction
+export interface IInstruction
 {
     opCode: OpCode;
     paramModes: ParamMode[];
@@ -82,6 +82,9 @@ export class IntCodeComputer
         this.log( `INSTRUCTION = ${instruction.opCode}, Parameter modes = ${instruction.paramModes}` );
         const params = this.GetParams( instruction.paramModes );
         let nextInstructionAddress = this.pos + BigInt( instruction.distanceToNextInstruction );
+
+        // TODO - opportunity for optimization (remove this call)
+        this.validateParams( params );
 
         switch ( instruction.opCode )
         {
@@ -148,7 +151,18 @@ export class IntCodeComputer
         this.log( "" ); // To visually separate different instructions
     }
 
-    private ParseInstruction(): Instruction
+    private validateParams( params: bigint[] )
+    {
+        for ( const param of params )
+        {
+            if ( param === undefined )
+                throw new Error( 'undefined param' );
+            else if ( typeof param !== 'bigint' )
+                throw new Error( 'param should be of type bigint' );
+        }
+    }
+
+    private ParseInstruction(): IInstruction
     {
         const opString = this.memory.load( this.pos ).toString();
         const opCode = parseInt( opString.slice( -2 ) ) as OpCode;
@@ -156,17 +170,31 @@ export class IntCodeComputer
 
         const instructionInfo = GetInstructionInfo( opCode );
 
-        while ( paramModes.length !== instructionInfo.numParams )
+        while ( paramModes.length < instructionInfo.numParams )
         {
-            paramModes.push( 0 );
+            paramModes.push( ParamMode.Position );
         }
 
         return {
             opCode: opCode,
             paramModes: paramModes,
-            resultAddress: instructionInfo.storesResult ? this.memory.load( this.pos + instructionInfo.resultOffset ) : null,
+            resultAddress: this.getResultAddress( opCode, instructionInfo, paramModes ),
             distanceToNextInstruction: instructionInfo.instructionLength
         };
+    }
+
+    // TODO - this whole method is gross. Clean it up.
+    private getResultAddress( opCode: OpCode, instructionInfo, paramModes: number[] ): bigint
+    {
+        if ( opCode === OpCode.StdIn && paramModes[0] === ParamMode.Relative )
+        {
+            const offset = this.memory.load( this.pos + BigInt( instructionInfo.numParams ) );
+            return this.relativeBase + offset;
+        }
+        else
+        {
+            return instructionInfo.storesResult ? this.memory.load( this.pos + instructionInfo.resultOffset ) : null;
+        }
     }
 
     private GetParams( paramModes: ParamMode[] ): bigint[]
@@ -190,9 +218,13 @@ export class IntCodeComputer
                     }
                 case ParamMode.Relative:
                     {
-                        const offset = this.memory.load( this.pos + BigInt( i ) );
+                        const offset = this.memory.load( this.pos + BigInt( i ) + 1n );
                         params[i] = this.memory.load( this.relativeBase + offset );
                         break;
+                    }
+                default:
+                    {
+                        throw new Error( "Unhandled ParamMode!" );
                     }
             }
         }
@@ -214,7 +246,7 @@ export class IntCodeComputer
 
     private async ReadFromStdIn( resultAddress: bigint ): Promise<void>
     {
-        const input = await this.stdIn.getInput();
+        const input = BigInt( await this.stdIn.getInput() );
 
         this.log( `Storing value ${input} at address ${resultAddress}` );
         this.memory.store( resultAddress, input );
@@ -253,7 +285,7 @@ export class IntCodeComputer
 
     private RelativeBaseOffset( increment: bigint )
     {
-        this.relativeBase + increment;
+        this.relativeBase += increment;
     }
 
     loadProgram( program: bigint[] | number[], arg1?: bigint | number, arg2?: bigint | number ): void

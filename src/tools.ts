@@ -1,3 +1,5 @@
+import * as fs from 'fs';
+
 // Example syntax: measureExecutionTime( console.log, ['hi'], 50 );
 
 export interface ExecutionTimerResult
@@ -113,6 +115,32 @@ export function NumToBigInt( arr: number[] ): bigint[]
     {
         output.push( BigInt( elem ) );
     } );
+
+    return output;
+}
+
+export function BigIntToNum( arr: bigint[] ): number[]
+{
+    let output: number[] = [];
+    arr.forEach( elem =>
+    {
+        output.push( Number( elem ) );
+    } );
+
+    return output;
+}
+
+export function readProblemTextAsBigIntArray( filename: string ): bigint[]
+{
+    let output: bigint[] = [];
+
+    const fileContents = fs.readFileSync( filename ).toString();
+    const elements = fileContents.split( ',' );
+
+    elements.forEach( element =>
+    {
+        output.push( BigInt( element ) );
+    } )
 
     return output;
 }

@@ -66,12 +66,20 @@ export function GetInstructionInfo( opCode: OpCode ): InstructionInfo
             instructionInfo.instructionLength = 4;
             break;
 
+        case OpCode.RelativeBaseOffset:
+            instructionInfo.numParams = 1;
+            instructionInfo.storesResult = false;
+            instructionInfo.instructionLength = 2;
+            break;
+
         case OpCode.End:
             instructionInfo.numParams = 0;
             instructionInfo.storesResult = false;
             instructionInfo.instructionLength = 1;
             break;
 
+        default:
+            throw new Error( "Undefined opcode!" );
     }
 
     return instructionInfo;

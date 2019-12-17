@@ -31,7 +31,7 @@ export class Amplifier
 
     setPhase( phaseValue: bigint ): void
     {
-        this.inputBuffer.queue.pushBack( phaseValue );
+        this.inputBuffer.queue.pushBack( BigInt( phaseValue ) );
     }
 
     async runProgram(): Promise<bigint>

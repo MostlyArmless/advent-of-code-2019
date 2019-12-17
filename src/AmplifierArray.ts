@@ -8,7 +8,7 @@ export class AmplifierArray
 {
     program: bigint[];
     amps: Amplifier[];
-    phaseSequence: number[];
+    phaseSequence: bigint[];
     inputBuffer: IoBuffer<bigint>;
     outputBuffer: IoBuffer<bigint>;
     enableLogging: boolean;

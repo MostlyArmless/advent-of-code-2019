@@ -17,7 +17,7 @@ describe( 'AmplifierArray', () =>
                 const program = [3, 15, 3, 16, 1002, 16, 10, 16, 1, 16, 15, 15, 4, 15, 99, 0, 0];
                 const testSubject = new AmplifierArray( numAmplifiers, 'serial', program, enableLogging );
                 const { maxOutput, bestPhaseSequence } = await testSubject.findMaxPossibleOutput( inputSignal );
-                expect( maxOutput ).to.equal( 43210 );
+                expect( maxOutput ).to.equal( 43210n );
                 expect( bestPhaseSequence ).to.eql( [4, 3, 2, 1, 0] );
             } );
 
@@ -27,7 +27,7 @@ describe( 'AmplifierArray', () =>
                     101, 5, 23, 23, 1, 24, 23, 23, 4, 23, 99, 0, 0];
                 const testSubject = new AmplifierArray( numAmplifiers, 'serial', program, enableLogging );
                 const { maxOutput, bestPhaseSequence } = await testSubject.findMaxPossibleOutput( inputSignal );
-                expect( maxOutput ).to.equal( 54321 );
+                expect( maxOutput ).to.equal( 54321n );
                 expect( bestPhaseSequence ).to.eql( [0, 1, 2, 3, 4] );
             } );
 
@@ -37,7 +37,7 @@ describe( 'AmplifierArray', () =>
                     1002, 33, 7, 33, 1, 33, 31, 31, 1, 32, 31, 31, 4, 31, 99, 0, 0, 0];
                 const testSubject = new AmplifierArray( numAmplifiers, 'serial', program, enableLogging );
                 const { maxOutput, bestPhaseSequence } = await testSubject.findMaxPossibleOutput( inputSignal );
-                expect( maxOutput ).to.equal( 65210 );
+                expect( maxOutput ).to.equal( 65210n );
                 expect( bestPhaseSequence ).to.eql( [1, 0, 4, 3, 2] );
             } );
         } );
@@ -50,7 +50,7 @@ describe( 'AmplifierArray', () =>
                     27, 4, 27, 1001, 28, -1, 28, 1005, 28, 6, 99, 0, 0, 5];
                 const testSubject = new AmplifierArray( numAmplifiers, 'feedback', program, enableLogging );
                 const { maxOutput, bestPhaseSequence } = await testSubject.findMaxPossibleOutput( inputSignal );
-                expect( maxOutput ).to.equal( 139629729 );
+                expect( maxOutput ).to.equal( 139629729n );
                 expect( bestPhaseSequence ).to.eql( [9, 8, 7, 6, 5] );
             } );
 
@@ -61,7 +61,7 @@ describe( 'AmplifierArray', () =>
                     53, 1001, 56, -1, 56, 1005, 56, 6, 99, 0, 0, 0, 0, 10];
                 const testSubject = new AmplifierArray( numAmplifiers, 'feedback', program, enableLogging );
                 const { maxOutput, bestPhaseSequence } = await testSubject.findMaxPossibleOutput( inputSignal );
-                expect( maxOutput ).to.equal( 18216 );
+                expect( maxOutput ).to.equal( 18216n );
                 expect( bestPhaseSequence ).to.eql( [9, 7, 8, 5, 6] );
             } );
         } );

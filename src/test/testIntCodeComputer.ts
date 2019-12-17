@@ -3,6 +3,7 @@ const expect = require( 'chai' ).expect;
 import { IntCodeComputer } from '../IntCodeComputer';
 import { MockStdIn } from '../Mocks/MockStdIn';
 import { MockStdOut } from '../Mocks/MockStdOut';
+import { BigIntToNum } from '../tools';
 
 describe( 'IntCodeComputer', () =>
 {
@@ -117,7 +118,7 @@ describe( 'IntCodeComputer', () =>
             m_mockStdIn.setInput( [8n] );
             m_testSubject.loadProgram( program );
             await m_testSubject.runProgram();
-            expect( m_mockStdOut.outputs ).to.eql( [1] );
+            expect( BigIntToNum( m_mockStdOut.outputs ) ).to.eql( [1] );
         } );
 
         it( 'Equality, position mode, false', async () =>
@@ -126,7 +127,7 @@ describe( 'IntCodeComputer', () =>
             m_mockStdIn.setInput( [7n] );
             m_testSubject.loadProgram( program );
             await m_testSubject.runProgram();
-            expect( m_mockStdOut.outputs ).to.eql( [0] );
+            expect( BigIntToNum( m_mockStdOut.outputs ) ).to.eql( [0] );
         } );
 
         it( 'Less-than, position mode, false', async () =>
@@ -135,7 +136,7 @@ describe( 'IntCodeComputer', () =>
             m_mockStdIn.setInput( [9n] );
             m_testSubject.loadProgram( program );
             await m_testSubject.runProgram();
-            expect( m_mockStdOut.outputs ).to.eql( [0] );
+            expect( BigIntToNum( m_mockStdOut.outputs ) ).to.eql( [0] );
         } );
 
         it( 'Less-than, position mode, true', async () =>
@@ -144,7 +145,7 @@ describe( 'IntCodeComputer', () =>
             m_mockStdIn.setInput( [7n] );
             m_testSubject.loadProgram( program );
             await m_testSubject.runProgram();
-            expect( m_mockStdOut.outputs ).to.eql( [1] );
+            expect( BigIntToNum( m_mockStdOut.outputs ) ).to.eql( [1] );
         } );
 
         it( 'Equal, immediate mode, false', async () =>
@@ -153,7 +154,7 @@ describe( 'IntCodeComputer', () =>
             m_mockStdIn.setInput( [7n] );
             m_testSubject.loadProgram( program );
             await m_testSubject.runProgram();
-            expect( m_mockStdOut.outputs ).to.eql( [0] );
+            expect( BigIntToNum( m_mockStdOut.outputs ) ).to.eql( [0] );
         } );
 
         it( 'Equal, immediate mode, true', async () =>
@@ -162,7 +163,7 @@ describe( 'IntCodeComputer', () =>
             m_mockStdIn.setInput( [8n] );
             m_testSubject.loadProgram( program );
             await m_testSubject.runProgram();
-            expect( m_mockStdOut.outputs ).to.eql( [1] );
+            expect( BigIntToNum( m_mockStdOut.outputs ) ).to.eql( [1] );
         } );
 
         it( 'Less-than, immediate mode, false', async () =>
@@ -171,7 +172,7 @@ describe( 'IntCodeComputer', () =>
             m_mockStdIn.setInput( [10n] );
             m_testSubject.loadProgram( program );
             await m_testSubject.runProgram();
-            expect( m_mockStdOut.outputs ).to.eql( [0] );
+            expect( BigIntToNum( m_mockStdOut.outputs ) ).to.eql( [0] );
         } );
 
         it( 'Less-than, immediate mode, true', async () =>
@@ -180,7 +181,7 @@ describe( 'IntCodeComputer', () =>
             m_mockStdIn.setInput( [7n] );
             m_testSubject.loadProgram( program );
             await m_testSubject.runProgram();
-            expect( m_mockStdOut.outputs ).to.eql( [1] );
+            expect( BigIntToNum( m_mockStdOut.outputs ) ).to.eql( [1] );
         } );
 
         it( 'Jump, position mode, output 0 if input 0, true', async () =>
@@ -189,7 +190,7 @@ describe( 'IntCodeComputer', () =>
             m_mockStdIn.setInput( [0n] );
             m_testSubject.loadProgram( program );
             await m_testSubject.runProgram();
-            expect( m_mockStdOut.outputs ).to.eql( [0] );
+            expect( BigIntToNum( m_mockStdOut.outputs ) ).to.eql( [0] );
         } );
 
         it( 'Jump, position mode, output 0 if input 0, false', async () =>
@@ -198,7 +199,7 @@ describe( 'IntCodeComputer', () =>
             m_mockStdIn.setInput( [-1n] );
             m_testSubject.loadProgram( program );
             await m_testSubject.runProgram();
-            expect( m_mockStdOut.outputs ).to.eql( [1] );
+            expect( BigIntToNum( m_mockStdOut.outputs ) ).to.eql( [1] );
         } );
 
         it( 'Jump, immediate mode, output 0 if input 0, true', async () =>
@@ -207,7 +208,7 @@ describe( 'IntCodeComputer', () =>
             m_mockStdIn.setInput( [0n] );
             m_testSubject.loadProgram( program );
             await m_testSubject.runProgram();
-            expect( m_mockStdOut.outputs ).to.eql( [0] );
+            expect( BigIntToNum( m_mockStdOut.outputs ) ).to.eql( [0] );
         } );
 
         it( 'Jump, immediate mode, output 0 if input 0, false', async () =>
@@ -216,7 +217,7 @@ describe( 'IntCodeComputer', () =>
             m_mockStdIn.setInput( [10n] );
             m_testSubject.loadProgram( program );
             await m_testSubject.runProgram();
-            expect( m_mockStdOut.outputs ).to.eql( [1] );
+            expect( BigIntToNum( m_mockStdOut.outputs ) ).to.eql( [1] );
         } );
 
         it( 'Output 999 if input < 8', async () =>
@@ -227,7 +228,7 @@ describe( 'IntCodeComputer', () =>
             m_mockStdIn.setInput( [7n] );
             m_testSubject.loadProgram( program );
             await m_testSubject.runProgram();
-            expect( m_mockStdOut.outputs ).to.eql( [999] );
+            expect( BigIntToNum( m_mockStdOut.outputs ) ).to.eql( [999] );
         } );
 
         it( 'Output 1000 if input == 8', async () =>
@@ -238,7 +239,7 @@ describe( 'IntCodeComputer', () =>
             m_mockStdIn.setInput( [8n] );
             m_testSubject.loadProgram( program );
             await m_testSubject.runProgram();
-            expect( m_mockStdOut.outputs ).to.eql( [1000] );
+            expect( BigIntToNum( m_mockStdOut.outputs ) ).to.eql( [1000] );
         } );
 
         it( 'Output 1001 if input > 8', async () =>
@@ -249,7 +250,7 @@ describe( 'IntCodeComputer', () =>
             m_mockStdIn.setInput( [9n] );
             m_testSubject.loadProgram( program );
             await m_testSubject.runProgram();
-            expect( m_mockStdOut.outputs ).to.eql( [1001] );
+            expect( BigIntToNum( m_mockStdOut.outputs ) ).to.eql( [1001] );
         } );
 
         it( 'Sample program from problem 7, A = 0, B = 0', async () =>
@@ -261,7 +262,7 @@ describe( 'IntCodeComputer', () =>
             m_mockStdIn.setInput( [0n, 0n] );
             m_testSubject.loadProgram( program );
             await m_testSubject.runProgram();
-            expect( m_mockStdOut.outputs ).to.eql( [0] );
+            expect( BigIntToNum( m_mockStdOut.outputs ) ).to.eql( [0] );
         } );
 
         it( 'Sample program from problem 7, A = 7, B = 11', async () =>
@@ -273,19 +274,26 @@ describe( 'IntCodeComputer', () =>
             m_mockStdIn.setInput( [7n, 11n] );
             m_testSubject.loadProgram( program );
             await m_testSubject.runProgram();
-            expect( m_mockStdOut.outputs ).to.eql( [117] );
+            expect( BigIntToNum( m_mockStdOut.outputs ) ).to.eql( [117] );
         } );
     } );
 
     describe( 'RelativeOffset', () =>
     {
-        it( 'Program that prints itself', () =>
+        it( 'Program that prints itself', async () =>
         {
-            const program = [109, 1, 204, -1, 1001, 100, 1, 100, 1008, 100, 16, 101, 1006, 101, 0, 99];
+            const program = [
+                109, 1, // Increment the relative base by 1
+                204, -1, // Output the value at address 'relBase - 1"
+                1001, 100, 1, 100, // Add the value at address 100 to the immediate '1'
+                1008, 100, 16, 101, // if the value at address 100 == 16, store 1 at address 101
+                1006, 101, 0, // If the value at address 101 == 0, jump to 0
+                99 // End
+            ];
             m_testSubject.loadProgram( program );
 
-            m_testSubject.runProgram();
-            expect( m_mockStdOut.outputs ).to.eql( program );
+            await m_testSubject.runProgram();
+            expect( BigIntToNum( m_mockStdOut.outputs ) ).to.eql( program );
         } );
 
         it( 'Output 16 digit number', async () =>
@@ -293,8 +301,35 @@ describe( 'IntCodeComputer', () =>
             const program = [1102, 34915192, 34915192, 7, 4, 7, 99, 0];
 
             m_testSubject.loadProgram( program );
-            const output = await ( await m_testSubject.runProgram() ).toString();
-            expect( output.length ).to.equal( 16 );
+            await m_testSubject.runProgram();
+
+            expect( m_mockStdOut.outputs[0].toString().length ).to.equal( 16 );
+        } );
+
+        it( 'Output large number', async () =>
+        {
+            const program = [104, 1125899906842624, 99];
+            m_testSubject.loadProgram( program );
+            await m_testSubject.runProgram();
+
+            expect( m_mockStdOut.outputs[0] ).to.equal( BigInt( program[1] ) );
+        } );
+
+        it( 'STDIN in relative mode', async () =>
+        {
+            const program = [
+                109, 3, // Set the relative base to 4
+                1101, 6, 7, 5, // Add 6+7, store at 5
+                203, 2, // Take input, store at relBase-1 = 4-1
+                1006, 5, 13, // If the value at address 5 == 0, jump to 0
+                104, 69, // Output 69 (shouldn't get here if it's working)
+                99 // End
+            ];
+            m_mockStdIn.setInput( [0n] );
+            m_testSubject.loadProgram( program );
+            await m_testSubject.runProgram();
+
+            expect( m_mockStdOut.outputs.length ).to.equal( 0 );
         } );
     } );
 } );

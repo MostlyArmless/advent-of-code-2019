@@ -30,16 +30,43 @@ export class Memory
 
     load( address: bigint ): bigint
     {
-        if ( address < Number.MAX_SAFE_INTEGER )
+        let retVal: bigint = null;
+
+        if ( address < 0 )
+            throw new Error( "Negative address" );
+
+        if ( address > this.ram.length && address < Number.MAX_SAFE_INTEGER )
         {
-            return this.ram[Number( address )];
+            this.ram[Number( address )] = 0n;
         }
 
-        return this.bigram.get( address );
+        if ( address < Number.MAX_SAFE_INTEGER )
+        {
+            retVal = this.ram[Number( address )];
+        }
+        else
+        {
+            retVal = this.bigram.get( address );
+        }
+
+        if ( typeof retVal !== 'bigint' )
+            throw new Error( `Somehow a non-bigint ended up in Memory, at address ${address}` );
+
+        return retVal;
     }
 
     store( address: bigint, value: bigint ): void
     {
+        if ( address < 0 )
+        {
+            throw new Error( "Can't store values at negative addresses" );
+        }
+
+        if ( typeof value !== 'bigint' )
+        {
+            throw new Error( "Can't story a non-bigint in Memory" );
+        }
+
         if ( address < Number.MAX_SAFE_INTEGER )
         {
             this.ram[Number( address )] = value;
