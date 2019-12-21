@@ -3,7 +3,7 @@ const expect = require( 'chai' ).expect;
 import { IntCodeComputer } from '../IntCodeComputer';
 import { MockStdIn } from '../Mocks/MockStdIn';
 import { MockStdOut } from '../Mocks/MockStdOut';
-import { BigIntToNum } from '../tools';
+import { BigIntToNum, readProblemTextAsBigIntArray } from '../tools';
 
 describe( 'IntCodeComputer', () =>
 {
@@ -330,6 +330,20 @@ describe( 'IntCodeComputer', () =>
             await m_testSubject.runProgram();
 
             expect( m_mockStdOut.outputs.length ).to.equal( 0 );
+        } );
+    } );
+
+    describe( 'BOOST test program', () =>
+    {
+        const problem9input: bigint[] = readProblemTextAsBigIntArray( './src/problem9input.txt' );
+
+        it( 'Diagnostic mode', async () =>
+        {
+            m_mockStdIn.setInput( [1n] );
+            m_testSubject.loadProgram( problem9input );
+            await m_testSubject.runProgram();
+
+            expect( m_mockStdOut.outputs ).to.eql( [3512778005n] );
         } );
     } );
 } );
