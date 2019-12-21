@@ -26,15 +26,16 @@ export class InstructionParser
             paramModes.push( ParamMode.Position );
         }
 
-        this.log( `INSTRUCTION = ${opCode}, Parameter modes = ${paramModes}` );
         const params = this.GetParams( instructionPointer, relativeBase, paramModes );
+        this.log( `INSTRUCTION = ${opCode}, Parameter modes = ${paramModes}, param values = ${params}` );
 
         this.validateParams( params );
+        const resultAddress = instructionInfo.storesResult ? this.getResultAddress( instructionPointer, BigInt( instructionInfo.numParams ), paramModes, relativeBase ) : null;
 
         return {
             opCode: opCode,
             paramModes: paramModes,
-            resultAddress: this.getResultAddress( instructionPointer, instructionInfo.resultOffset, paramModes, relativeBase ),
+            resultAddress: resultAddress,
             distanceToNextInstruction: instructionInfo.instructionLength,
             params: params
         };

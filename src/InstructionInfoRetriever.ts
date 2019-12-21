@@ -4,7 +4,6 @@ export interface InstructionInfo
 {
     numParams: number;
     storesResult: boolean;
-    resultOffset: bigint | null;
     instructionLength: number;
     resultAddressIsParam: boolean;
 }
@@ -14,19 +13,18 @@ export function GetInstructionInfo( opCode: OpCode ): InstructionInfo
     let instructionInfo: InstructionInfo = {
         numParams: 0,
         storesResult: false,
-        resultOffset: null,
         instructionLength: 0,
         resultAddressIsParam: false
     };
-
+    // Note that numParams includes both parameters that are inputs as well as the output address.
+    // Therefore, the offset between the opcode and the result address param is always numParams
     switch ( opCode )
     {
         case OpCode.Add:
         case OpCode.Multiply:
-            instructionInfo.numParams = 2;
+            instructionInfo.numParams = 3;
             instructionInfo.storesResult = true;
             instructionInfo.resultAddressIsParam = false;
-            instructionInfo.resultOffset = BigInt( instructionInfo.numParams + 1 );
             instructionInfo.instructionLength = 4;
             break;
 
@@ -34,7 +32,6 @@ export function GetInstructionInfo( opCode: OpCode ): InstructionInfo
             instructionInfo.numParams = 1;
             instructionInfo.storesResult = true;
             instructionInfo.resultAddressIsParam = true;
-            instructionInfo.resultOffset = BigInt( instructionInfo.numParams );
             instructionInfo.instructionLength = 2;
             break;
 
@@ -57,18 +54,16 @@ export function GetInstructionInfo( opCode: OpCode ): InstructionInfo
             break;
 
         case OpCode.LessThan:
-            instructionInfo.numParams = 2;
+            instructionInfo.numParams = 3;
             instructionInfo.storesResult = true;
             instructionInfo.resultAddressIsParam = false;
-            instructionInfo.resultOffset = BigInt( instructionInfo.numParams + 1 );
             instructionInfo.instructionLength = 4;
             break;
 
         case OpCode.Equals:
-            instructionInfo.numParams = 2;
+            instructionInfo.numParams = 3;
             instructionInfo.storesResult = true;
             instructionInfo.resultAddressIsParam = false;
-            instructionInfo.resultOffset = BigInt( instructionInfo.numParams + 1 );
             instructionInfo.instructionLength = 4;
             break;
 

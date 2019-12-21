@@ -43,10 +43,20 @@ export class Memory
         if ( address < Number.MAX_SAFE_INTEGER )
         {
             retVal = this.ram[Number( address )];
+            if ( retVal === undefined )
+            {
+                this.ram[Number( address )] = 0n;
+                return 0n;
+            }
         }
         else
         {
             retVal = this.bigram.get( address );
+            if ( retVal === undefined )
+            {
+                this.bigram.set( address, 0n );
+                return 0n;
+            }
         }
 
         if ( typeof retVal !== 'bigint' )
@@ -69,7 +79,7 @@ export class Memory
 
         if ( address < Number.MAX_SAFE_INTEGER )
         {
-            this.ram[Number( address )] = value;
+            this.ram[Number( address )] = BigInt( value );
         }
         else
         {
