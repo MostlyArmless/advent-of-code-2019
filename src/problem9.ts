@@ -18,4 +18,18 @@ async function problem9a()
     console.log( `Answer to problem 9 = ${mockStdOut.outputs[0]}` );
 }
 
+async function problem9b()
+{
+    const mockStdIn = new MockStdIn<bigint>( [2n] );
+    const mockStdOut = new MockStdOut<bigint>();
+    const computer = new IntCodeComputer( mockStdIn, mockStdOut, false );
+
+    computer.loadProgram( problem9input );
+    await computer.runProgram();
+
+    console.log( mockStdOut.outputs );
+    console.log( `Answer to problem 9 = ${mockStdOut.outputs[0]}` );
+}
+
 measureExecutionTime( problem9a );
+measureExecutionTime( problem9b );
