@@ -57,7 +57,7 @@ export class Memory
 
     store( address: bigint, value: bigint ): void
     {
-        if ( address < 0 )
+        if ( address < 0n )
         {
             throw new Error( "Can't store values at negative addresses" );
         }

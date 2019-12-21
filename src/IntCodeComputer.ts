@@ -1,8 +1,8 @@
 import { IStdIn, IStdOut } from './interfaces';
-import { GetInstructionInfo } from './InstructionInfoRetriever';
 import { Memory } from './Memory';
+import { InstructionParser } from './InstructionParser';
 
-enum ParamMode
+export enum ParamMode
 {
     Position,
     Immediate,
@@ -26,6 +26,7 @@ export enum OpCode
 export interface IInstruction
 {
     opCode: OpCode;
+    params: bigint[];
     paramModes: ParamMode[];
     resultAddress: bigint;
     distanceToNextInstruction: number; // Amount you need to increment the program counter by to reach the next instruction
@@ -45,6 +46,7 @@ export class IntCodeComputer
     stdOut: IStdOut<bigint>;
     id: number;
     relativeBase: bigint;
+    instructionParser: InstructionParser;
 
     constructor( stdIn: IStdIn<bigint>, stdOut: IStdOut<bigint>, enableLogging?: boolean, id?: number )
     {
@@ -67,6 +69,7 @@ export class IntCodeComputer
         this.numInstructionsProcessed = 0;
         this.resultAddress = null;
         this.relativeBase = 0n;
+        this.instructionParser = new InstructionParser( this.memory, this.enableLogging );
     }
 
     private log( msg: string ): void
@@ -78,13 +81,10 @@ export class IntCodeComputer
     private async runNextInstruction(): Promise<void>
     {
         this.log( `pos = ${this.pos}` );
-        const instruction = this.ParseInstruction();
-        this.log( `INSTRUCTION = ${instruction.opCode}, Parameter modes = ${instruction.paramModes}` );
-        const params = this.GetParams( instruction.paramModes );
+        const instruction = this.instructionParser.parse( this.pos, this.relativeBase );
         let nextInstructionAddress = this.pos + BigInt( instruction.distanceToNextInstruction );
 
-        // TODO - opportunity for optimization (remove this call)
-        this.validateParams( params );
+        const params = instruction.params;
 
         switch ( instruction.opCode )
         {
@@ -100,7 +100,15 @@ export class IntCodeComputer
                 }
             case OpCode.StdIn:
                 {
-                    await this.ReadFromStdIn( instruction.resultAddress );
+                    try
+                    {
+                        await this.ReadFromStdIn( instruction.resultAddress );
+                    }
+                    catch ( error )
+                    {
+                        throw new Error( "Failed to read from STDIN" );
+                    }
+
                     break;
                 }
             case OpCode.StdOut:
@@ -149,87 +157,6 @@ export class IntCodeComputer
         this.pos = nextInstructionAddress;
         this.numInstructionsProcessed += 1;
         this.log( "" ); // To visually separate different instructions
-    }
-
-    private validateParams( params: bigint[] )
-    {
-        for ( const param of params )
-        {
-            if ( param === undefined )
-                throw new Error( 'undefined param' );
-            else if ( typeof param !== 'bigint' )
-                throw new Error( 'param should be of type bigint' );
-        }
-    }
-
-    private ParseInstruction(): IInstruction
-    {
-        const opString = this.memory.load( this.pos ).toString();
-        const opCode = parseInt( opString.slice( -2 ) ) as OpCode;
-        let paramModes = opString.slice( 0, -2 ).split( '' ).reverse().map( char => parseInt( char ) );
-
-        const instructionInfo = GetInstructionInfo( opCode );
-
-        while ( paramModes.length < instructionInfo.numParams )
-        {
-            paramModes.push( ParamMode.Position );
-        }
-
-        return {
-            opCode: opCode,
-            paramModes: paramModes,
-            resultAddress: this.getResultAddress( opCode, instructionInfo, paramModes ),
-            distanceToNextInstruction: instructionInfo.instructionLength
-        };
-    }
-
-    // TODO - this whole method is gross. Clean it up.
-    private getResultAddress( opCode: OpCode, instructionInfo, paramModes: number[] ): bigint
-    {
-        if ( opCode === OpCode.StdIn && paramModes[0] === ParamMode.Relative )
-        {
-            const offset = this.memory.load( this.pos + BigInt( instructionInfo.numParams ) );
-            return this.relativeBase + offset;
-        }
-        else
-        {
-            return instructionInfo.storesResult ? this.memory.load( this.pos + instructionInfo.resultOffset ) : null;
-        }
-    }
-
-    private GetParams( paramModes: ParamMode[] ): bigint[]
-    {
-        let params = Array( paramModes.length );
-
-        for ( let i = 0; i < paramModes.length; i++ )
-        {
-            switch ( paramModes[i] )
-            {
-                case ParamMode.Position:
-                    {
-                        const address = this.memory.load( this.pos + BigInt( i ) + 1n );
-                        params[i] = this.memory.load( address );
-                        break;
-                    }
-                case ParamMode.Immediate:
-                    {
-                        params[i] = this.memory.load( this.pos + BigInt( i ) + 1n );
-                        break;
-                    }
-                case ParamMode.Relative:
-                    {
-                        const offset = this.memory.load( this.pos + BigInt( i ) + 1n );
-                        params[i] = this.memory.load( this.relativeBase + offset );
-                        break;
-                    }
-                default:
-                    {
-                        throw new Error( "Unhandled ParamMode!" );
-                    }
-            }
-        }
-
-        return params;
     }
 
     private Multiply( A: bigint, B: bigint, resultAddress: bigint ): void

@@ -6,6 +6,7 @@ export interface InstructionInfo
     storesResult: boolean;
     resultOffset: bigint | null;
     instructionLength: number;
+    resultAddressIsParam: boolean;
 }
 
 export function GetInstructionInfo( opCode: OpCode ): InstructionInfo
@@ -14,7 +15,8 @@ export function GetInstructionInfo( opCode: OpCode ): InstructionInfo
         numParams: 0,
         storesResult: false,
         resultOffset: null,
-        instructionLength: 0
+        instructionLength: 0,
+        resultAddressIsParam: false
     };
 
     switch ( opCode )
@@ -23,6 +25,7 @@ export function GetInstructionInfo( opCode: OpCode ): InstructionInfo
         case OpCode.Multiply:
             instructionInfo.numParams = 2;
             instructionInfo.storesResult = true;
+            instructionInfo.resultAddressIsParam = false;
             instructionInfo.resultOffset = BigInt( instructionInfo.numParams + 1 );
             instructionInfo.instructionLength = 4;
             break;
@@ -30,6 +33,7 @@ export function GetInstructionInfo( opCode: OpCode ): InstructionInfo
         case OpCode.StdIn:
             instructionInfo.numParams = 1;
             instructionInfo.storesResult = true;
+            instructionInfo.resultAddressIsParam = true;
             instructionInfo.resultOffset = BigInt( instructionInfo.numParams );
             instructionInfo.instructionLength = 2;
             break;
@@ -55,6 +59,7 @@ export function GetInstructionInfo( opCode: OpCode ): InstructionInfo
         case OpCode.LessThan:
             instructionInfo.numParams = 2;
             instructionInfo.storesResult = true;
+            instructionInfo.resultAddressIsParam = false;
             instructionInfo.resultOffset = BigInt( instructionInfo.numParams + 1 );
             instructionInfo.instructionLength = 4;
             break;
@@ -62,6 +67,7 @@ export function GetInstructionInfo( opCode: OpCode ): InstructionInfo
         case OpCode.Equals:
             instructionInfo.numParams = 2;
             instructionInfo.storesResult = true;
+            instructionInfo.resultAddressIsParam = false;
             instructionInfo.resultOffset = BigInt( instructionInfo.numParams + 1 );
             instructionInfo.instructionLength = 4;
             break;
