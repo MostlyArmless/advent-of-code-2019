@@ -144,3 +144,10 @@ export function readProblemTextAsBigIntArray( filename: string ): bigint[]
 
     return output;
 }
+
+export function readFileAsArrayOfLines( filename: string ): string[]
+{
+    const fileContents = fs.readFileSync( filename ).toString();
+    const lines = fileContents.split( '\n' );
+    return lines;
+}
