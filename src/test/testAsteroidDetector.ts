@@ -7,12 +7,11 @@ chai.use( require( 'chai-string' ) ); // Extension that provides the "string sho
 
 describe( 'AsteroidDetector', () =>
 {
-    describe( 'Sample tests', () =>
+    describe( 'Find the best monitoring location', () =>
     {
-        describe( 'Sample 1', () =>
+        it( 'Basic example', () =>
         {
-            let testSubject: AsteroidDetector;
-            const asteroidMap1 =
+            const asteroidMap =
                 [
                     '.#..#',
                     '.....',
@@ -20,44 +19,134 @@ describe( 'AsteroidDetector', () =>
                     '....#',
                     '...##'
                 ];
-            const numAsteroids = 10;
+            const testSubject = new AsteroidDetector( asteroidMap );
+            const result = testSubject.findBestMonitoringLocation();
+            console.log( result );
+            expect( result.bestStationCoords.getAsteroidId() ).to.equal( '3,4' );
+        } );
 
-            beforeEach( () =>
-            {
-                testSubject = new AsteroidDetector( asteroidMap1 );
-            } );
+        it( 'Obscuring test', () =>
+        {
+            const asteroidMap = [
+                '#.........',
+                '...#......',
+                '...#..#...',
+                '.####....#',
+                '..#.#.#...',
+                '.....#....',
+                '..###.#.##',
+                '.......#..',
+                '....#...#.',
+                '...#..#..#'
+            ];
+            const testSubject = new AsteroidDetector( asteroidMap );
+            const result = testSubject.findBestMonitoringLocation();
+            console.log( result );
+            const neighborsOfTopLeftNode = testSubject.visibilityGraph.getNodeNeighborsWithValues( '0,0' );
 
-            it( 'Constructs graph correctly', () =>
-            {
-                expect( testSubject.asteroidCoords.length ).to.equal( numAsteroids );
-                expect( testSubject.visibilityGraph.adjacencyList.size ).to.equal( numAsteroids );
-                expect( testSubject.visibilityGraph.nodeValues.size ).to.equal( numAsteroids );
+            expect( neighborsOfTopLeftNode.size ).to.equal( 7 );
+            expect( neighborsOfTopLeftNode ).to.have.all.keys(
+                '3,1',
+                '3,2',
+                '1,3',
+                '2,3',
+                '3,3',
+                '4,3',
+                '2,4' );
+        } );
 
-                expect( testSubject.visibilityGraph.nodeValues ).to.have.all.keys(
-                    '1,0',
-                    '4,0',
-                    '0,2',
-                    '1,2',
-                    '2,2',
-                    '3,2',
-                    '4,2',
-                    '4,3',
-                    '3,4',
-                    '4,4'
-                );
+        it( 'Bigger example 1', () =>
+        {
+            const asteroidMap = [
+                '......#.#.',
+                '#..#.#....',
+                '..#######.',
+                '.#.#.###..',
+                '.#..#.....',
+                '..#....#.#',
+                '#..#....#.',
+                '.##.#..###',
+                '##...#..#.',
+                '.#....####'
+            ];
 
-                testSubject.visibilityGraph.adjacencyList.forEach( ( value, key ) =>
-                {
-                    expect( value.size, `${key} should have ${numAsteroids} neighbors` ).to.equal( numAsteroids );
-                } );
-            } );
+            const testSubject = new AsteroidDetector( asteroidMap );
+            const result = testSubject.findBestMonitoringLocation();
+            expect( result.asteroidsVisibleFromBestStation.size ).to.equal( 33 );
+            expect( result.bestStationCoords.getAsteroidId() ).to.equal( '5,8' )
+        } );
 
-            it( 'Find best monitoring location', async () =>
-            {
-                const result = testSubject.findBestMonitoringLocation();
-                console.log( result );
-                expect( [result.bestStationCoords.x, result.bestStationCoords.y] ).to.deep.equal( [3, 4] );
-            } );
+        it( 'Bigger example 2', () =>
+        {
+            const asteroidMap = [
+                '#.#...#.#.',
+                '.###....#.',
+                '.#....#...',
+                '##.#.#.#.#',
+                '....#.#.#.',
+                '.##..###.#',
+                '..#...##..',
+                '..##....##',
+                '......#...',
+                '.####.###.'
+            ];
+
+            const testSubject = new AsteroidDetector( asteroidMap );
+            const result = testSubject.findBestMonitoringLocation();
+            expect( result.asteroidsVisibleFromBestStation.size ).to.equal( 35 );
+            expect( result.bestStationCoords.getAsteroidId() ).to.equal( '1,2' )
+        } );
+
+        it( 'Bigger example 3', () =>
+        {
+            const asteroidMap = [
+                '.#..#..###',
+                '####.###.#',
+                '....###.#.',
+                '..###.##.#',
+                '##.##.#.#.',
+                '....###..#',
+                '..#.#..#.#',
+                '#..#.#.###',
+                '.##...##.#',
+                '.....#.#..'
+            ];
+
+            const testSubject = new AsteroidDetector( asteroidMap );
+            const result = testSubject.findBestMonitoringLocation();
+            expect( result.asteroidsVisibleFromBestStation.size ).to.equal( 41 );
+            expect( result.bestStationCoords.getAsteroidId() ).to.equal( '6,3' )
+        } );
+
+        it( 'Bigger example 4', () =>
+        {
+            const asteroidMap = [
+                '.#..##.###...#######',
+                '##.############..##.',
+                '.#.######.########.#',
+                '.###.#######.####.#.',
+                '#####.##.#.##.###.##',
+                '..#####..#.#########',
+                '####################',
+                '#.####....###.#.#.##',
+                '##.#################',
+                '#####.##.###..####..',
+                '..######..##.#######',
+                '####.##.####...##..#',
+                '.#####..#.######.###',
+                '##...#.##########...',
+                '#.##########.#######',
+                '.####.#.###.###.#.##',
+                '....##.##.###..#####',
+                '.#.#.###########.###',
+                '#.#.#.#####.####.###',
+                '###.##.####.##.#..##'
+            ];
+
+            const testSubject = new AsteroidDetector( asteroidMap );
+            const result = testSubject.findBestMonitoringLocation();
+            expect( result.asteroidsVisibleFromBestStation.size ).to.equal( 210 );
+            expect( result.bestStationCoords.getAsteroidId() ).to.equal( '11,13' )
         } );
 
     } );

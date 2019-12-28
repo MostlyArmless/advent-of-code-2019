@@ -4,7 +4,7 @@ import { AmplifierArray } from '../AmplifierArray';
 
 describe( 'AmplifierArray', () =>
 {
-    const enableLogging = true;
+    const enableLogging = false;
     const numAmplifiers = 5;
     const inputSignal = 0;
 

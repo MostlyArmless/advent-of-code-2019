@@ -49,6 +49,9 @@ export class Graph<K, V>
 
     addEdge( nodeA: K, nodeB: K ): void
     {
+        if ( nodeA === nodeB )
+            return; // Don't allow edges between a node and itself, makes no sense.
+
         let neighborsOfA = this.getNodeNeighbors( nodeA );
         neighborsOfA.add( nodeB );
         this.adjacencyList.set( nodeA, neighborsOfA );
@@ -69,6 +72,9 @@ export class Graph<K, V>
         this.addNode( nodeName, nodeValue );
         this.nodeValues.forEach( ( value, existingNodeName ) =>
         {
+            if ( nodeName === existingNodeName )
+                return; // Don't allow a node to list itself as a connection, makes no sense
+
             this.addEdge( existingNodeName, nodeName );
         } );
     }

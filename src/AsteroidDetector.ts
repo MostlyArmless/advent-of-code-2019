@@ -1,21 +1,14 @@
 import { Graph } from "./Graph";
+import { translateCoords } from "./CoordinateTranslator";
+import { AsteroidId, AsteroidCoord } from "./Coord";
 
 type Theta = number;
 type R = number;
-type AsteroidId = string;
-
-interface AsteroidCoord
-{
-    x: number;
-    y: number;
-    r: number;
-    theta: number;
-}
 
 export interface MonitoringStationInfo
 {
     bestStationCoords: AsteroidCoord;
-    asteroidsVisibleFromStation: Map<AsteroidId, AsteroidCoord>;
+    asteroidsVisibleFromBestStation: Map<AsteroidId, AsteroidCoord>;
 }
 
 export class AsteroidDetector
@@ -44,112 +37,73 @@ export class AsteroidDetector
             {
                 if ( line[iCol] === '#' )
                 {
-                    const { r, theta } = this.convertXyToRTheta( iCol, iRow );
-                    const asteroid: AsteroidCoord = {
-                        x: iCol,
-                        y: iRow,
-                        r: r,
-                        theta: theta
-                    };
-                    this.asteroidCoords.push( asteroid );
-                    const asteroidId = this.getAsteroidId( asteroid );
-                    this.visibilityGraph.addFullyConnectedNode( asteroidId, asteroid );
+                    this.addNewAsteroidWithConnections( iCol, iRow );
                 }
             }
             iRow++;
         } );
     }
 
-    private getAsteroidId( asteroid: AsteroidCoord ): AsteroidId
+    private addNewAsteroidWithConnections( iCol: number, iRow: number )
     {
-        return `${asteroid.x},${asteroid.y}`;
-    }
+        const asteroid = new AsteroidCoord( iCol, iRow );
+        this.asteroidCoords.push( asteroid );
+        const asteroidId = asteroid.getAsteroidId();
 
-    private convertXyToRTheta( x: number, y: number ): { r: number, theta: number }
-    {
-        return {
-            r: Math.sqrt( x ** 2 + y ** 2 ),
-            theta: Math.atan( y / x )
-        }
+        // This asteroid exists, so create a node for it
+        this.visibilityGraph.addNode( asteroidId, asteroid );
+
+        // Now connect this node in the graph to ONLY other nodes it can actually see
+        let polarCoordsToNeighbors = new Map<Theta, [R, AsteroidCoord]>();
+
+        this.visibilityGraph.nodeValues.forEach( ( otherAsteroid, id ) =>
+        {
+            const relativeCoords = translateCoords( asteroid, otherAsteroid );
+            if ( polarCoordsToNeighbors.has( relativeCoords.theta ) )
+            {
+                // There are other asteroids along this axis.
+                const closestAlongThisAxisSoFar = polarCoordsToNeighbors.get( relativeCoords.theta );
+                if ( relativeCoords.r < closestAlongThisAxisSoFar[0] )
+                {
+                    // replace previous closest with this one
+                    polarCoordsToNeighbors.set( relativeCoords.theta, [relativeCoords.r, otherAsteroid] );
+                }
+            }
+            else
+            {
+                // This is the first other asteroid we've seen along this axis
+                polarCoordsToNeighbors.set( relativeCoords.theta, [relativeCoords.r, otherAsteroid] );
+            }
+        } );
+
+        // Now that we've found the closest asteroid in each direction, add edges between this asteroid and those ones.
+        polarCoordsToNeighbors.forEach( ( value, key ) =>
+        {
+            this.visibilityGraph.addEdge( asteroidId, value[1].getAsteroidId() );
+        } );
     }
 
     findBestMonitoringLocation(): MonitoringStationInfo
     {
-        // graph pruning method
-        // Upon construction, we built a fully connected graph. Now we can iterate the nodes in the graph, deleting edges where the line of sight is blocked
-        const nodes = this.visibilityGraph.getAllNodes();
-        nodes.forEach( ( currentAsteroid, nodeName ) =>
+        let bestNode = '';
+        let maxNeighborsSoFar = Number.MIN_SAFE_INTEGER;
+
+        this.visibilityGraph.adjacencyList.forEach( ( neighbors, nodeId ) =>
         {
-            const neighbors = this.visibilityGraph.getNodeNeighborsWithValues( nodeName );
-
-            let polarCoordsToNeighbors = new Map<Theta, [R, AsteroidCoord]>();
-            neighbors.forEach( neighborAsteroid =>
+            if ( neighbors.size > maxNeighborsSoFar )
             {
-                if ( this.getAsteroidId( currentAsteroid ) === this.getAsteroidId( neighborAsteroid ) )
-                    return;
-
-                const relativeCoords = this.translateCoords( currentAsteroid, neighborAsteroid );
-                if ( polarCoordsToNeighbors.has( relativeCoords.theta ) )
-                {
-                    const otherAsteroidInfo = polarCoordsToNeighbors.get( relativeCoords.theta );
-                    const smallestDistanceSoFar = otherAsteroidInfo[0];
-                    const otherNeighborAsteroid = otherAsteroidInfo[1];
-
-                    if ( relativeCoords.r < smallestDistanceSoFar )
-                    {
-                        // This neighbor is closer than the one we previously encountered
-                        this.visibilityGraph.deleteEdge( this.getAsteroidId( currentAsteroid ), this.getAsteroidId( otherNeighborAsteroid ) );
-                    }
-                    else
-                    {
-                        // The previously encountered neighbor is closer than this neighbor
-                        this.visibilityGraph.deleteEdge( this.getAsteroidId( currentAsteroid ), this.getAsteroidId( neighborAsteroid ) );
-                    }
-                }
-                else
-                {
-                    // This is the first asteroid we've found at this angle. Save it for later
-                    polarCoordsToNeighbors.set( relativeCoords.theta, [relativeCoords.r, neighborAsteroid] );
-                }
-            } );
-        } );
-
-        // Now that we've finished pruning the graph, we can ask it how many asteroids are visible from each asteroid
-        this.visibilityGraph.printAdjacencies();
-        let maxNeighbors = 0;
-        let bestNode: AsteroidId = null;
-        this.visibilityGraph.adjacencyList.forEach( ( neighbors, nodeName ) =>
-        {
-            if ( neighbors.size > maxNeighbors )
-            {
-                maxNeighbors = neighbors.size;
-                bestNode = nodeName;
+                bestNode = nodeId;
+                maxNeighborsSoFar = neighbors.size;
             }
         } );
 
         const retVal: MonitoringStationInfo = {
             bestStationCoords: this.visibilityGraph.getNodeValue( bestNode ),
-            asteroidsVisibleFromStation: this.visibilityGraph.getNodeNeighborsWithValues( bestNode )
+            asteroidsVisibleFromBestStation: this.visibilityGraph.getNodeNeighborsWithValues( bestNode )
         };
 
-        this.printMapWithVisibilityIndices();
+        // this.printMapWithVisibilityIndices();
         return retVal;
-    }
-
-    private translateCoords( newOrigin: AsteroidCoord, pointToTranslate: AsteroidCoord ): AsteroidCoord
-    {
-        const translatedX = pointToTranslate.x - newOrigin.x;
-        const translatedY = pointToTranslate.y - newOrigin.y;
-        const { r, theta } = this.convertXyToRTheta( translatedX, translatedY );
-
-        let translatedPoint: AsteroidCoord = {
-            x: translatedX,
-            y: translatedY,
-            r: r,
-            theta: theta
-        };
-
-        return translatedPoint;
     }
 
     printMapWithVisibilityIndices(): void
