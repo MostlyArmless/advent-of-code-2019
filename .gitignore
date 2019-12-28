@@ -2,3 +2,4 @@
 **/node_modules/
 # Ignore the outputs of tsc
 /build/
+scratch.*s

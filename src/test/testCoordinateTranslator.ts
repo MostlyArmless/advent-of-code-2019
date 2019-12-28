@@ -16,7 +16,7 @@ describe( 'Coordinate Translator', () =>
         {
             const { r, theta } = convertXyToRTheta( 1, Math.sqrt( 3 ) );
             expect( r ).to.almost.equal( 2 );
-            expect( theta ).to.almost.equal( 60 * Math.PI / 180 );
+            expect( theta ).to.almost.equal( 60 );
         } );
     } );
 
