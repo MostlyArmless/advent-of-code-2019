@@ -1,6 +1,6 @@
-import { measureExecutionTime } from "./tools";
+import { measureExecutionTime } from "../tools";
 import { problem8input } from './problem8input';
-import { ImageDecoder } from "./ImageDecoder";
+import { ImageDecoder } from "../ImageDecoder";
 
 const imageWidth = 25;
 const imageHeight = 6;

@@ -1,5 +1,5 @@
-import { measureExecutionTime, readFileAsArrayOfLines } from "./tools";
-import { AsteroidDetector } from "./AsteroidDetector";
+import { measureExecutionTime, readFileAsArrayOfLines } from "../tools";
+import { AsteroidDetector } from "../AsteroidDetector";
 
 const problem10input = readFileAsArrayOfLines( './src/problem10input.txt' );
 function problem10a()

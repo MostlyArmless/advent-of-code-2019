@@ -1,7 +1,7 @@
-import { measureExecutionTime, readProblemTextAsBigIntArray } from "./tools";
-import { IntCodeComputer } from "./IntCodeComputer";
-import { MockStdIn } from "./Mocks/MockStdIn";
-import { MockStdOut } from "./Mocks/MockStdOut";
+import { measureExecutionTime, readProblemTextAsBigIntArray } from "../tools";
+import { IntCodeComputer } from "../IntCodeComputer";
+import { MockStdIn } from "../Mocks/MockStdIn";
+import { MockStdOut } from "../Mocks/MockStdOut";
 
 const problem9input: bigint[] = readProblemTextAsBigIntArray( './src/problem9input.txt' );
 

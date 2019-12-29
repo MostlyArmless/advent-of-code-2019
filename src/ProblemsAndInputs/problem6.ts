@@ -1,6 +1,6 @@
-import { measureExecutionTime } from "./tools";
+import { measureExecutionTime } from "../tools";
 import { problem6Input } from './problem6Input';
-import { OrbitLengthChecker } from "./OrbitLengthChecker";
+import { OrbitLengthChecker } from "../OrbitLengthChecker";
 
 function problem6a()
 {

@@ -1,6 +1,6 @@
-import { measureExecutionTime } from "./tools";
+import { measureExecutionTime } from "../tools";
 import { problem7input } from './problem7input';
-import { AmplifierArray } from "./AmplifierArray";
+import { AmplifierArray } from "../AmplifierArray";
 
 async function problem7a()
 {

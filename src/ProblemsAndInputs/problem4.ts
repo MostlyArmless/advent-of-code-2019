@@ -1,4 +1,4 @@
-import { measureExecutionTime } from "./tools";
+import { measureExecutionTime } from "../tools";
 
 const pwMinVal = 138241;
 const pwMaxVal = 674034;
