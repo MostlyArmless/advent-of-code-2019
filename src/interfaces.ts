@@ -7,3 +7,11 @@ export interface IStdOut<T>
 {
     sendOutput( value: T ): void;
 }
+
+export interface IComputer
+{
+    loadProgram( program: bigint[] ): void;
+    runProgram(): Promise<bigint>;
+    reset(): void;
+    isRunning: boolean;
+}

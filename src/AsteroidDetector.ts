@@ -1,29 +1,30 @@
 import { Graph } from "./Graph";
 import { translateCoords } from "./CoordinateTranslator";
-import { AsteroidId, AsteroidCoord } from "./Coord";
+import { Coordinate } from "./Coord";
 
 type Theta = number;
 type R = number;
+type AsteroidId = string;
 
 export interface MonitoringStationInfo
 {
-    bestStationCoords: AsteroidCoord;
-    asteroidsVisibleFromBestStation: Map<AsteroidId, AsteroidCoord>;
+    bestStationCoords: Coordinate;
+    asteroidsVisibleFromBestStation: Map<AsteroidId, Coordinate>;
 }
 
 export class AsteroidDetector
 {
-    asteroidCoords: AsteroidCoord[];
-    visibilityGraph: Graph<AsteroidId, AsteroidCoord>;
+    asteroidCoords: Coordinate[];
+    visibilityGraph: Graph<AsteroidId, Coordinate>;
     mapWidth: number;
     mapHeight: number;
-    private bestMonitoringLocation: AsteroidCoord;
+    private bestMonitoringLocation: Coordinate;
     private laserFiringOrder: AsteroidId[];
 
     constructor( asteroidMap: string[] )
     {
         this.asteroidCoords = [];
-        this.visibilityGraph = new Graph<AsteroidId, AsteroidCoord>();
+        this.visibilityGraph = new Graph<AsteroidId, Coordinate>();
         this.mapHeight = asteroidMap.length;
         this.mapWidth = asteroidMap[0].length;
         this.bestMonitoringLocation = null;
@@ -49,15 +50,15 @@ export class AsteroidDetector
 
     private addNewAsteroidWithConnections( iCol: number, iRow: number )
     {
-        const asteroid = new AsteroidCoord( iCol, iRow );
+        const asteroid = new Coordinate( iCol, iRow );
         this.asteroidCoords.push( asteroid );
-        const asteroidId = asteroid.getAsteroidId();
+        const asteroidId = asteroid.getId();
 
         // This asteroid exists, so create a node for it
         this.visibilityGraph.addNode( asteroidId, asteroid );
 
         // Now connect this node in the graph to ONLY other nodes it can actually see
-        let polarCoordsToNeighbors = new Map<Theta, [R, AsteroidCoord]>();
+        let polarCoordsToNeighbors = new Map<Theta, [R, Coordinate]>();
 
         this.visibilityGraph.nodeValues.forEach( ( otherAsteroid, id ) =>
         {
@@ -82,7 +83,7 @@ export class AsteroidDetector
         // Now that we've found the closest asteroid in each direction, add edges between this asteroid and those ones.
         polarCoordsToNeighbors.forEach( ( value, key ) =>
         {
-            this.visibilityGraph.addEdge( asteroidId, value[1].getAsteroidId() );
+            this.visibilityGraph.addEdge( asteroidId, value[1].getId() );
         } );
     }
 
@@ -115,7 +116,7 @@ export class AsteroidDetector
             this.findBestMonitoringLocation();
 
         let laserFiringOrder: AsteroidId[] = [];
-        const translationBackToOriginalOrigin = new AsteroidCoord( -this.bestMonitoringLocation.x, -this.bestMonitoringLocation.y );
+        const translationBackToOriginalOrigin = new Coordinate( -this.bestMonitoringLocation.x, -this.bestMonitoringLocation.y );
 
         // Translate the coordinates of every asteroid such that the laser is at the origin
         const asteroidRelativePositions = this.asteroidCoords.map( asteroid =>
@@ -137,11 +138,11 @@ export class AsteroidDetector
                     break;
 
                 const nextAsteroidToDestroy = asteroidsPerAngle[i][1].pop();
-                if ( nextAsteroidToDestroy === undefined || nextAsteroidToDestroy.getAsteroidId() === '0,0' )
+                if ( nextAsteroidToDestroy === undefined || nextAsteroidToDestroy.getId() === '0,0' )
                     continue;
 
                 const nextAsteroidToDestroyOriginalCoordinates = translateCoords( translationBackToOriginalOrigin, nextAsteroidToDestroy );
-                laserFiringOrder.push( nextAsteroidToDestroyOriginalCoordinates.getAsteroidId() );
+                laserFiringOrder.push( nextAsteroidToDestroyOriginalCoordinates.getId() );
             }
         }
 
@@ -149,9 +150,9 @@ export class AsteroidDetector
         return laserFiringOrder;
     }
 
-    private binAsteroidsByAngle( asteroidRelativePositions: AsteroidCoord[] ): Map<Theta, AsteroidCoord[]>
+    private binAsteroidsByAngle( asteroidRelativePositions: Coordinate[] ): Map<Theta, Coordinate[]>
     {
-        let asteroidsPerAngle: Map<Theta, AsteroidCoord[]> = new Map<Theta, AsteroidCoord[]>();
+        let asteroidsPerAngle: Map<Theta, Coordinate[]> = new Map<Theta, Coordinate[]>();
         asteroidRelativePositions.forEach( asteroid =>
         {
             let asteroidsAtThisAngle = asteroidsPerAngle.has( asteroid.theta ) ? asteroidsPerAngle.get( asteroid.theta ) : [];
@@ -235,7 +236,7 @@ export class AsteroidDetector
                     continue;
                 }
 
-                if ( coords === this.bestMonitoringLocation.getAsteroidId() )
+                if ( coords === this.bestMonitoringLocation.getId() )
                 {
                     mapString += 'X  ';
                     continue;

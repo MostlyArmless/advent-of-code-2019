@@ -5,9 +5,9 @@ export class MockStdIn<T> implements IStdIn<T>
     values: T[];
     index: number;
 
-    constructor( numbersToYield: T[] )
+    constructor( numbersToYield?: T[] )
     {
-        this.values = numbersToYield;
+        this.values = numbersToYield ? numbersToYield : [];
         this.index = 0;
     }
 

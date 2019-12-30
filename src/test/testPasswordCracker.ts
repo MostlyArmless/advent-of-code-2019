@@ -3,7 +3,7 @@
 const expect = require( 'chai' ).expect;
 // const assert = require('chai').assert;
 import * as chai from 'chai';
-import { hasPairOfMatchingDigits, hasPairOfMatchingDigitsNotPartOfLargerGroup } from '../problem4';
+import { hasPairOfMatchingDigits, hasPairOfMatchingDigitsNotPartOfLargerGroup } from '../ProblemsAndInputs/problem4';
 chai.use( require( 'chai-as-promised' ) ); // Extension that defines the "eventually" keyword
 chai.use( require( 'chai-string' ) ); // Extension that provides the "string should contain" functionality
 

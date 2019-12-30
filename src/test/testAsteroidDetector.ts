@@ -1,9 +1,6 @@
 // Test framework dependencies
 const expect = require( 'chai' ).expect;
-import * as chai from 'chai';
 import { AsteroidDetector } from '../AsteroidDetector';
-chai.use( require( 'chai-as-promised' ) ); // Extension that defines the "eventually" keyword
-chai.use( require( 'chai-string' ) ); // Extension that provides the "string should contain" functionality
 
 describe( 'AsteroidDetector', () =>
 {
@@ -22,7 +19,7 @@ describe( 'AsteroidDetector', () =>
             const testSubject = new AsteroidDetector( asteroidMap );
             const result = testSubject.findBestMonitoringLocation();
             console.log( result );
-            expect( result.bestStationCoords.getAsteroidId() ).to.equal( '3,4' );
+            expect( result.bestStationCoords.getId() ).to.equal( '3,4' );
         } );
 
         it( 'Obscuring test', () =>
@@ -73,7 +70,7 @@ describe( 'AsteroidDetector', () =>
             const testSubject = new AsteroidDetector( asteroidMap );
             const result = testSubject.findBestMonitoringLocation();
             expect( result.asteroidsVisibleFromBestStation.size ).to.equal( 33 );
-            expect( result.bestStationCoords.getAsteroidId() ).to.equal( '5,8' )
+            expect( result.bestStationCoords.getId() ).to.equal( '5,8' )
         } );
 
         it( 'Bigger example 2', () =>
@@ -94,7 +91,7 @@ describe( 'AsteroidDetector', () =>
             const testSubject = new AsteroidDetector( asteroidMap );
             const result = testSubject.findBestMonitoringLocation();
             expect( result.asteroidsVisibleFromBestStation.size ).to.equal( 35 );
-            expect( result.bestStationCoords.getAsteroidId() ).to.equal( '1,2' )
+            expect( result.bestStationCoords.getId() ).to.equal( '1,2' )
         } );
 
         it( 'Bigger example 3', () =>
@@ -115,7 +112,7 @@ describe( 'AsteroidDetector', () =>
             const testSubject = new AsteroidDetector( asteroidMap );
             const result = testSubject.findBestMonitoringLocation();
             expect( result.asteroidsVisibleFromBestStation.size ).to.equal( 41 );
-            expect( result.bestStationCoords.getAsteroidId() ).to.equal( '6,3' )
+            expect( result.bestStationCoords.getId() ).to.equal( '6,3' )
         } );
 
         it( 'Bigger example 4', () =>
@@ -146,7 +143,7 @@ describe( 'AsteroidDetector', () =>
             const testSubject = new AsteroidDetector( asteroidMap );
             const result = testSubject.findBestMonitoringLocation();
             expect( result.asteroidsVisibleFromBestStation.size ).to.equal( 210 );
-            expect( result.bestStationCoords.getAsteroidId() ).to.equal( '11,13' )
+            expect( result.bestStationCoords.getId() ).to.equal( '11,13' )
         } );
 
     } );

@@ -1,4 +1,4 @@
-import { IStdIn, IStdOut } from './interfaces';
+import { IStdIn, IStdOut, IComputer } from './interfaces';
 import { Memory } from './Memory';
 import { InstructionParser } from './InstructionParser';
 
@@ -32,12 +32,12 @@ export interface IInstruction
     distanceToNextInstruction: number; // Amount you need to increment the program counter by to reach the next instruction
 }
 
-export class IntCodeComputer
+export class IntCodeComputer implements IComputer
 {
     enableLogging: boolean = false;
     memory: Memory;
     pos: bigint;
-    shouldContinue: boolean;
+    isRunning: boolean;
     params: bigint[];
     paramModes: ParamMode[];
     resultAddress: bigint;
@@ -63,7 +63,7 @@ export class IntCodeComputer
     {
         this.memory = new Memory();
         this.pos = 0n;
-        this.shouldContinue = true;
+        this.isRunning = true;
         this.params = [null, null, null, null];
         this.paramModes = [null, null, null, null]
         this.numInstructionsProcessed = 0;
@@ -143,13 +143,13 @@ export class IntCodeComputer
                 }
             case 99: // END
                 {
-                    this.shouldContinue = false;
+                    this.isRunning = false;
                     break;
                 }
             default:
                 {
                     console.error( `Attempted to run invalid instruction '${instruction.opCode}' at position ${this.pos}` );
-                    this.shouldContinue = false;
+                    this.isRunning = false;
                 }
         }
 
@@ -225,12 +225,12 @@ export class IntCodeComputer
             this.memory.store( 2n, BigInt( arg2 ) );
 
         this.pos = 0n;
-        this.shouldContinue = true;
+        this.isRunning = true;
     }
 
     async runProgram(): Promise<bigint>
     {
-        while ( this.shouldContinue )
+        while ( this.isRunning )
         {
             await this.runNextInstruction();
         }

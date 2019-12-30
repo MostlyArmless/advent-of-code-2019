@@ -335,7 +335,7 @@ describe( 'IntCodeComputer', () =>
 
     describe( 'BOOST test program', () =>
     {
-        const problem9input: bigint[] = readProblemTextAsBigIntArray( './src/problem9input.txt' );
+        const problem9input: bigint[] = readProblemTextAsBigIntArray( './src/ProblemsAndInputs/problem9input.txt' );
 
         it( 'Diagnostic mode', async () =>
         {

@@ -1,11 +1,11 @@
-import { AsteroidCoord } from "./Coord";
+import { Coordinate } from "./Coord";
 
-export function translateCoords( newOrigin: AsteroidCoord, pointToTranslate: AsteroidCoord ): AsteroidCoord
+export function translateCoords( newOrigin: Coordinate, pointToTranslate: Coordinate ): Coordinate
 {
     const translatedX = pointToTranslate.x - newOrigin.x;
     const translatedY = pointToTranslate.y - newOrigin.y;
 
-    let translatedPoint = new AsteroidCoord( translatedX, translatedY );
+    let translatedPoint = new Coordinate( translatedX, translatedY );
 
     return translatedPoint;
 }

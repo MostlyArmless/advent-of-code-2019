@@ -1,17 +1,6 @@
 import { convertXyToRTheta } from "./CoordinateTranslator";
 
-export type AsteroidId = string;
-
-export interface IAsteroidCoord
-{
-    x: number;
-    y: number;
-    r: number;
-    theta: number;
-    getAsteroidId(): string;
-}
-
-export class AsteroidCoord implements AsteroidCoord
+export class Coordinate
 {
     x: number;
     y: number;
@@ -23,14 +12,26 @@ export class AsteroidCoord implements AsteroidCoord
     {
         this.x = x;
         this.y = y;
+        this.updateRThetaId( x, y );
+    }
+
+    private updateRThetaId( x: number, y: number )
+    {
         const { r, theta } = convertXyToRTheta( x, y );
         this.r = r;
         this.theta = theta;
         this.id = `${this.x},${this.y}`;
     }
 
-    getAsteroidId(): AsteroidId
+    getId(): string
     {
         return this.id;
+    }
+
+    move( dx: number, dy: number ): void
+    {
+        this.x += dx;
+        this.y += dy;
+        this.updateRThetaId( this.x, this.y );
     }
 }
