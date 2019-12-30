@@ -53,15 +53,26 @@ export class Grid<T>
         }
     }
 
-    toString(): string
+    toString( shouldInvert?: boolean ): string
     {
         let str = '';
-        for ( let iRow = 0; iRow < this.numRows; iRow++ )
+        if ( shouldInvert )
         {
-            str += this.grid[iRow].toString() + '\n';
+            for ( let iRow = this.numRows - 1; iRow >= 0; iRow-- )
+            {
+                str += this.grid[iRow].toString() + '\n';
+            }
+        }
+        else
+        {
+            for ( let iRow = 0; iRow < this.numRows; iRow++ )
+            {
+                str += this.grid[iRow].toString() + '\n';
+            }
         }
 
-        return str;
+
+        return str.replace( /,/g, ' ' );;
     }
 }
 

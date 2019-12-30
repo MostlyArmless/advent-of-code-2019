@@ -1,7 +1,8 @@
 import { Coordinate } from "./Coord";
 import { Grid } from "./Grid";
 import { IoBuffer } from "./IoBuffer";
-import { IComputer } from "./interfaces";
+import { IComputer, LoggingLevel } from "./interfaces";
+import { translateCoords } from "./CoordinateTranslator";
 
 type CoordinateId = string;
 type Arrow = '^' | '<' | '>' | 'v';
@@ -34,8 +35,9 @@ export class PaintingRobot
     private orientation: Arrow;
     private radiusToDisplay: number;
     private numMovesProcessed: number;
+    private loggingLevel: LoggingLevel;
 
-    constructor( computer: IComputer, camera: IoBuffer<bigint>, nextActions: IoBuffer<bigint>, program: bigint[] )
+    constructor( computer: IComputer, camera: IoBuffer<bigint>, nextActions: IoBuffer<bigint>, program: bigint[], loggingLevel?: LoggingLevel )
     {
         this.camera = camera;
         this.nextActions = nextActions;
@@ -43,10 +45,11 @@ export class PaintingRobot
 
         this.computer.loadProgram( program );
         this.visitsPerPanel = new Map<CoordinateId, Color[]>();
-        this.radiusToDisplay = 3;
+        this.radiusToDisplay = 5;
         this.position = new Coordinate( 0, 0 );
         this.orientation = '^';
         this.numMovesProcessed = 0;
+        this.loggingLevel = loggingLevel;
     }
 
     async paint(): Promise<void>
@@ -141,21 +144,31 @@ export class PaintingRobot
 
     drawState(): void
     {
+        if ( this.loggingLevel < LoggingLevel.Verbose )
+            return;
+
         console.log( `State after ${this.numMovesProcessed} moves:` );
         const grid = new Grid<string>( this.radiusToDisplay, this.radiusToDisplay, '.' );
 
-        grid.set( this.position.y, this.position.x, this.orientation );
+        // Define (0,0) to be in the middle
+        const offset = -Math.floor( ( this.radiusToDisplay + 1 ) / 2 );
+        const newOrigin = new Coordinate( offset, offset );
+        const positionTranslated = translateCoords( newOrigin, this.position );
 
         this.visitsPerPanel.forEach( ( colors, coordinateId ) =>
         {
             const xy = coordinateId.split( ',' );
             const x = parseInt( xy[0] );
             const y = parseInt( xy[1] );
-            const color = colors[colors.length - 1] === Color.White ? Color.White : Color.Black;;
-            grid.set( x, y, color );
+            const color = colors[colors.length - 1] === Color.White ? Color.White : Color.Black;
+            const point = new Coordinate( x, y );
+            const pointTranslated = translateCoords( newOrigin, point );
+            grid.set( pointTranslated.y, pointTranslated.x, color );
         } );
 
-        console.log( grid.toString() );
+        grid.set( positionTranslated.y, positionTranslated.x, this.orientation ); // Draw after to make sure the robot always appears on top
+
+        console.log( grid.toString( true ) );
         console.log(); // Blank line for separation
     }
 }

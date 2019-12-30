@@ -2,16 +2,17 @@ import { readProblemTextAsBigIntArray, measureExecutionTime } from "../tools";
 import { PaintingRobot } from "../PaintingRobot";
 import { IoBuffer } from "../IoBuffer";
 import { IntCodeComputer } from "../IntCodeComputer";
+import { LoggingLevel } from "../interfaces";
 
-const problem11input = readProblemTextAsBigIntArray( './src/problem11input.txt' );
+const problem11input = readProblemTextAsBigIntArray( './src/ProblemsAndInputs/problem11input.txt' );
 
 async function problem11a()
 {
     const camera = new IoBuffer<bigint>();
     const nextActions = new IoBuffer<bigint>();
-    const computer = new IntCodeComputer( camera, nextActions, true );
+    const computer = new IntCodeComputer( camera, nextActions );
 
-    const robot = new PaintingRobot( computer, camera, nextActions, problem11input );
+    const robot = new PaintingRobot( computer, camera, nextActions, problem11input, LoggingLevel.Verbose );
 
     await robot.paint();
     const numPanelsPaintedAtLeastOnce = robot.getNumPanelsPaintedAtLeastOnce();

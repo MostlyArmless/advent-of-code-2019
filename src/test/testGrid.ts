@@ -10,6 +10,7 @@ describe( 'Grid', () =>
     {
         grid = new Grid( 3, 5, 'x' );
     } )
+
     it( 'Constructs properly', () =>
     {
         const { numRows, numCols } = grid.getSize();
@@ -36,8 +37,21 @@ describe( 'Grid', () =>
 
     it( 'toString', () =>
     {
+        const { numRows, numCols } = grid.getSize();
+
+        // Fill each element with a unique value
+        let i = 0;
+        for ( let iRow = 0; iRow < numRows; iRow++ )
+        {
+            for ( let iCol = 0; iCol < numCols; iCol++ )
+            {
+                grid.set( iRow, iCol, i.toString() );
+                i++;
+            }
+        }
+
         const gridStr = grid.toString();
-        const expectedString = 'x,x,x,x,x\nx,x,x,x,x\nx,x,x,x,x\n';
+        const expectedString = '0 1 2 3 4\n5 6 7 8 9\n10 11 12 13 14\n';
         expect( gridStr ).to.equal( expectedString );
     } );
 } );

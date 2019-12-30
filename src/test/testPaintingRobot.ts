@@ -30,15 +30,6 @@ describe( 'PaintingRobot', () =>
         const numPanelsPaintedAtLeastOnce = robot.getNumPanelsPaintedAtLeastOnce();
 
         expect( computer.outputs.length ).to.equal( 0 );
-        // expect( computer.receivedInputs ).to.deep.equal( [
-        //     0n,
-        //     0n,
-        //     0n,
-        //     1n,
-        //     0n,
-        //     0n,
-        //     0n
-        // ] );
         expect( numPanelsPaintedAtLeastOnce ).to.equal( 6 );
     } );
 } );

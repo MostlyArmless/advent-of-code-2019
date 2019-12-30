@@ -15,3 +15,9 @@ export interface IComputer
     reset(): void;
     isRunning: boolean;
 }
+
+export enum LoggingLevel
+{
+    Basic,
+    Verbose
+}
