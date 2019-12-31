@@ -39,6 +39,7 @@ export class PaintingRobot
     private numMovesProcessed: number;
     private loggingLevel: LoggingLevel;
     private numUniquePaintJobsApplied: number;
+    private panelsVisited: Set<string>;
 
     constructor( computer: IComputer, camera: IoBuffer<bigint>, nextActions: IoBuffer<bigint>, program: bigint[], loggingLevel?: LoggingLevel )
     {
@@ -46,6 +47,7 @@ export class PaintingRobot
         this.nextActions = nextActions;
         this.computer = computer;
 
+        this.computer.reset();
         this.computer.loadProgram( program );
         this.visitsPerPanel = new Map<CoordinateId, Color[]>();
         this.maxRadiusReached = 5;
@@ -54,7 +56,8 @@ export class PaintingRobot
         this.orientation = '^';
         this.numMovesProcessed = 0;
         this.loggingLevel = loggingLevel;
-        this.numUniquePaintJobsApplied = 0;
+        this.numUniquePaintJobsApplied = 0; // TODO delete me
+        this.panelsVisited = new Set<string>();
     }
 
     async paint(): Promise<void>
@@ -113,6 +116,8 @@ export class PaintingRobot
 
     private paintCurrentPosition( paintColor: Color )
     {
+        this.panelsVisited.add( this.position.getId() );
+
         if ( this.visitsPerPanel.has( this.position.getId() ) )
         {
             // We've been here before
@@ -183,6 +188,11 @@ export class PaintingRobot
         return this.visitsPerPanel.size
     }
 
+    getNumPanelsVisited(): number
+    {
+        return this.panelsVisited.size;
+    }
+
     getNumUniquePaintsApplied(): number
     {
         return this.numUniquePaintJobsApplied;
@@ -212,10 +222,11 @@ export class PaintingRobot
             grid.set( pointTranslated.y, pointTranslated.x, color );
         } );
 
-        grid.set( positionTranslated.y, positionTranslated.x, this.orientation ); // Draw after to make sure the robot always appears on top
-        const originColors = this.visitsPerPanel.get( '0,0' )
+        const originColors = this.visitsPerPanel.has( '0,0' ) ? this.visitsPerPanel.get( '0,0' ) : Color.Black;
         const finalOriginColor = originColors[originColors.length - 1] === Color.Black ? 'B' : 'W';
         grid.set( yGrid, xGrid, finalOriginColor );
+
+        grid.set( positionTranslated.y, positionTranslated.x, this.orientation ); // Draw after to make sure the robot always appears on top
 
         if ( filename )
         {
@@ -224,6 +235,8 @@ export class PaintingRobot
         else
         {
             console.log( grid.toString( true ) );
+            console.log( `Visited ${this.panelsVisited.size} panels` );
+
         }
     }
 }

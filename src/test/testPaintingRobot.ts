@@ -158,18 +158,18 @@ describe( 'PaintingRobot', () =>
     it( 'Circle pattern repeated', async () =>
     {
         computer.setOutputSequence( [
-            1n, 1n, // white, right
-            1n, 0n, // white, left
-            1n, 0n, // white, left
-            1n, 0n, // white, left
-            1n, 1n, // white, right
-            1n, 1n, // white, right
-            1n, 1n, // white, right
-            1n, 0n, // white, left
-            1n, 0n, // white, left
-            1n, 0n, // white, left
-            1n, 1n, // white, right
-            1n, 1n, // white, right
+            0n, 1n, // black, right
+            0n, 0n, // black, left
+            0n, 0n, // black, left
+            0n, 0n, // black, left
+            0n, 1n, // black, right
+            0n, 1n, // black, right
+            0n, 1n, // black, right
+            0n, 0n, // black, left
+            0n, 0n, // black, left
+            0n, 0n, // black, left
+            0n, 1n, // black, right
+            0n, 1n, // black, right
         ] );
 
         await robot.paint();

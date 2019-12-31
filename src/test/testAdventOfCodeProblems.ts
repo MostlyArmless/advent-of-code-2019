@@ -10,6 +10,7 @@ import { problem7a, problem7b } from "../ProblemsAndInputs/problem7";
 import { problem8a } from "../ProblemsAndInputs/problem8";
 import { problem9a, problem9b } from "../ProblemsAndInputs/problem9";
 import { problem10a, problem10b } from "../ProblemsAndInputs/problem10";
+import { problem11a } from "../ProblemsAndInputs/problem11";
 
 describe( 'Advent of Code Problems', () =>
 {
@@ -126,11 +127,10 @@ describe( 'Advent of Code Problems', () =>
         expect( result.functionOutput ).to.deep.equal( 1623 );
     } );
 
-    // TODO add test once you solve 11a
-    // it( 'Problem 11a - PainterRobot', async () =>
-    // {
-    //     const result = await measureExecutionTime( problem11a );
-    //     expect( result.runtimeSeconds ).to.be.lte( 1.5 );
-    //     expect( result.functionOutput ).to.deep.equal( ? );
-    // } );
+    it( 'Problem 11a - PainterRobot', async () =>
+    {
+        const result = await measureExecutionTime( problem11a );
+        expect( result.runtimeSeconds ).to.be.lte( 1.5 );
+        expect( result.functionOutput ).to.be.lessThan( 5279 ); // TODO give this a real criterion.
+    } );
 } );

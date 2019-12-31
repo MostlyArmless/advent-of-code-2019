@@ -6,7 +6,7 @@ import { LoggingLevel } from "../interfaces";
 
 const problem11input = readProblemTextAsBigIntArray( './src/ProblemsAndInputs/problem11input.txt' );
 
-async function problem11a()
+export async function problem11a(): Promise<number>
 {
     const camera = new IoBuffer<bigint>();
     const nextActions = new IoBuffer<bigint>();
@@ -17,8 +17,11 @@ async function problem11a()
     await robot.paint();
     robot.drawState( './robotPainting.txt' );
     const numPanelsPaintedAtLeastOnce = robot.getNumPanelsPaintedAtLeastOnce();
-    const otherCount = robot.getNumUniquePaintsApplied();
+    const otherCount = robot.getNumPanelsVisited();
+
+    const answer = numPanelsPaintedAtLeastOnce;
     console.log( `Answer to problem 11a = ${numPanelsPaintedAtLeastOnce}, but it might be = ${otherCount}` );
+    return answer;
 }
 
 measureExecutionTime( problem11a );
