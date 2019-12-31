@@ -149,6 +149,8 @@ describe( 'PaintingRobot', () =>
             1n, 0n, // white, left
             1n, 0n, // white, left
             1n, 0n, // white, left
+            1n, 1n, // white, right
+            1n, 1n, // white, right
         ] );
 
         const robot = new PaintingRobot( computer, camera, nextActions, MockProgram, LoggingLevel.Off );
@@ -158,6 +160,6 @@ describe( 'PaintingRobot', () =>
         robot.drawState();
 
         expect( computer.outputs.length ).to.equal( 0 );
-        expect( numPanelsPaintedAtLeastOnce ).to.equal( 4 );
+        expect( numPanelsPaintedAtLeastOnce ).to.equal( 5 );
     } );
 } );

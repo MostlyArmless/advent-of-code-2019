@@ -1,16 +1,16 @@
 import { Deferred } from "./Deferred";
 
-export const queueTimeoutMilliseconds = 100;
-
 export class Queue<T>
 {
     values: T[];
     deferredValues: Deferred<T>[];
+    timeoutMilliseconds: number;
 
-    constructor()
+    constructor( timeoutMilliseconds?: number )
     {
         this.values = [];
         this.deferredValues = [];
+        this.timeoutMilliseconds = timeoutMilliseconds ? timeoutMilliseconds : 10;
     }
 
     pushBack( value: T )
@@ -41,8 +41,8 @@ export class Queue<T>
             // If no value gets pushed to the Queue in the next 500ms, we'll reject the promise
             setTimeout( () =>
             {
-                dfd.reject( `No value was pushed to the Queue within the ${queueTimeoutMilliseconds}ms timeout` );
-            }, queueTimeoutMilliseconds );
+                dfd.reject( `No value was pushed to the Queue within the ${this.timeoutMilliseconds}ms timeout` );
+            }, this.timeoutMilliseconds );
 
             return dfd.promise;
         }
@@ -51,5 +51,7 @@ export class Queue<T>
     clear(): void
     {
         this.values = [];
+        this.deferredValues.forEach( dfd => dfd.reject );
+        this.deferredValues = [];
     }
 }
