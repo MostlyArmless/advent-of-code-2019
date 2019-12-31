@@ -10,7 +10,7 @@ export class Queue<T>
     {
         this.values = [];
         this.deferredValues = [];
-        this.timeoutMilliseconds = timeoutMilliseconds ? timeoutMilliseconds : 10;
+        this.timeoutMilliseconds = timeoutMilliseconds ? timeoutMilliseconds : 2;
     }
 
     pushBack( value: T )
