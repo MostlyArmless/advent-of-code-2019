@@ -1,7 +1,7 @@
 // Test framework dependencies
 const expect = require( 'chai' ).expect;
 import * as chai from 'chai';
-import { Queue } from '../Queue';
+import { Queue, queueTimeoutMilliseconds } from '../Queue';
 chai.use( require( 'chai-as-promised' ) ); // Extension that defines the "eventually" keyword
 chai.use( require( 'chai-string' ) ); // Extension that provides the "string should contain" functionality
 
@@ -23,8 +23,8 @@ describe( 'Queue', () =>
 
     it( 'Long wait for a value does not crash Nodejs', async function ()
     {
-        const longWait = 1000 * 60 * 2; // Two minute wait
-        this.timeout( longWait + 500 );
+        const longWait = 2 * queueTimeoutMilliseconds; // Two minute wait
+        this.timeout( longWait + 50 );
         const popPromise = testSubject.popFront();
 
         setTimeout( () =>
@@ -50,8 +50,8 @@ describe( 'Queue', () =>
 
     it( 'Short wait for a value (less than timeout) returns the value', async function ()
     {
-        const shortWait = 450; // just under the time it takes for the Queue to time out
-        this.timeout( shortWait + 500 );
+        const shortWait = queueTimeoutMilliseconds - 50; // just under the time it takes for the Queue to time out
+        this.timeout( shortWait + 50 ); // Make sure the test doesn't time out before we're done waiting
         const popPromise = testSubject.popFront();
 
         setTimeout( () =>
