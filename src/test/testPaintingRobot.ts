@@ -12,6 +12,7 @@ describe( 'PaintingRobot', () =>
     let nextActions: IoBuffer<bigint>;
     let outputsToSendAfterEachInput: number;
     let computer: MockComputer;
+    let robot: PaintingRobot;
 
     beforeEach( () =>
     {
@@ -19,7 +20,10 @@ describe( 'PaintingRobot', () =>
         nextActions = new IoBuffer<bigint>();
         outputsToSendAfterEachInput = 2;
         computer = new MockComputer( camera, nextActions, outputsToSendAfterEachInput );
+
+        robot = new PaintingRobot( computer, camera, nextActions, MockProgram, LoggingLevel.Off );
     } );
+
     it( 'Sample', async () =>
     {
         computer.setOutputSequence( [
@@ -31,8 +35,6 @@ describe( 'PaintingRobot', () =>
             1n, 0n, // white, left
             1n, 0n // white, left
         ] );
-
-        const robot = new PaintingRobot( computer, camera, nextActions, MockProgram, LoggingLevel.Off );
 
         await robot.paint();
         const numPanelsPaintedAtLeastOnce = robot.getNumPanelsPaintedAtLeastOnce();
@@ -57,8 +59,6 @@ describe( 'PaintingRobot', () =>
             1n, 0n, // white, left
         ] );
 
-        const robot = new PaintingRobot( computer, camera, nextActions, MockProgram, LoggingLevel.Off );
-
         await robot.paint();
         const numPanelsPaintedAtLeastOnce = robot.getNumPanelsPaintedAtLeastOnce();
         robot.drawState();
@@ -80,8 +80,6 @@ describe( 'PaintingRobot', () =>
             1n, 1n, // white, right
             1n, 0n, // white, left
         ] );
-
-        const robot = new PaintingRobot( computer, camera, nextActions, MockProgram, LoggingLevel.Off );
 
         await robot.paint();
         const numPanelsPaintedAtLeastOnce = robot.getNumPanelsPaintedAtLeastOnce();
@@ -105,8 +103,6 @@ describe( 'PaintingRobot', () =>
             1n, 1n, // white, right
             1n, 0n, // white, left
         ] );
-
-        const robot = new PaintingRobot( computer, camera, nextActions, MockProgram, LoggingLevel.Off );
 
         await robot.paint();
         const numPanelsPaintedAtLeastOnce = robot.getNumPanelsPaintedAtLeastOnce();
@@ -132,8 +128,6 @@ describe( 'PaintingRobot', () =>
             1n, 0n, // white, left
         ] );
 
-        const robot = new PaintingRobot( computer, camera, nextActions, MockProgram, LoggingLevel.Off );
-
         await robot.paint();
         const numPanelsPaintedAtLeastOnce = robot.getNumPanelsPaintedAtLeastOnce();
         robot.drawState();
@@ -153,13 +147,64 @@ describe( 'PaintingRobot', () =>
             1n, 1n, // white, right
         ] );
 
-        const robot = new PaintingRobot( computer, camera, nextActions, MockProgram, LoggingLevel.Off );
-
         await robot.paint();
         const numPanelsPaintedAtLeastOnce = robot.getNumPanelsPaintedAtLeastOnce();
         robot.drawState();
 
         expect( computer.outputs.length ).to.equal( 0 );
         expect( numPanelsPaintedAtLeastOnce ).to.equal( 5 );
+    } );
+
+    it( 'Circle pattern repeated', async () =>
+    {
+        computer.setOutputSequence( [
+            1n, 1n, // white, right
+            1n, 0n, // white, left
+            1n, 0n, // white, left
+            1n, 0n, // white, left
+            1n, 1n, // white, right
+            1n, 1n, // white, right
+            1n, 1n, // white, right
+            1n, 0n, // white, left
+            1n, 0n, // white, left
+            1n, 0n, // white, left
+            1n, 1n, // white, right
+            1n, 1n, // white, right
+        ] );
+
+        await robot.paint();
+        const numPanelsPaintedAtLeastOnce = robot.getNumPanelsPaintedAtLeastOnce();
+        robot.drawState();
+
+        expect( computer.outputs.length ).to.equal( 0 );
+        expect( numPanelsPaintedAtLeastOnce ).to.equal( 9 );
+    } );
+
+    it( 'Moved right 1', async () =>
+    {
+        computer.setOutputSequence( [
+            1n, 1n, // white, right
+        ] );
+
+        await robot.paint();
+        const numPanelsPaintedAtLeastOnce = robot.getNumPanelsPaintedAtLeastOnce();
+        robot.drawState();
+
+        expect( computer.outputs.length ).to.equal( 0 );
+        expect( numPanelsPaintedAtLeastOnce ).to.equal( 1 );
+    } );
+
+    it( 'Moved left 1', async () =>
+    {
+        computer.setOutputSequence( [
+            1n, 0n, // white, left
+        ] );
+
+        await robot.paint();
+        const numPanelsPaintedAtLeastOnce = robot.getNumPanelsPaintedAtLeastOnce();
+        robot.drawState();
+
+        expect( computer.outputs.length ).to.equal( 0 );
+        expect( numPanelsPaintedAtLeastOnce ).to.equal( 1 );
     } );
 } );
