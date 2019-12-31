@@ -3,3 +3,4 @@
 # Ignore the outputs of tsc
 /build/
 scratch.*s
+**/**/robotPainting.txt

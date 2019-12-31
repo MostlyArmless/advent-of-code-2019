@@ -35,6 +35,14 @@ export class Queue<T>
         {
             const dfd = new Deferred<T>();
             this.deferredValues.push( dfd );
+
+            // If no value gets pushed to the Queue in the next 500ms, we'll reject the promise
+            const timeout = 500; // ms
+            setTimeout( () =>
+            {
+                dfd.reject( `No value was pushed to the Queue within the ${timeout}ms timeout` );
+            }, timeout );
+
             return dfd.promise;
         }
     }

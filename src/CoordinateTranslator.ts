@@ -18,6 +18,14 @@ export function convertXyToRTheta( x: number, y: number ): { r: number, theta: n
     }
 }
 
+export function convertRThetaToXy( r: number, thetaDegrees: number ): { x: number, y: number }
+{
+    return {
+        x: roundToNDecimalPlaces( r * Math.cos( thetaDegrees * Math.PI / 180 ), 9 ),
+        y: roundToNDecimalPlaces( r * Math.sin( thetaDegrees * Math.PI / 180 ), 9 )
+    }
+}
+
 export function convertDegreesToRadians( deg: number ): number
 {
     return roundToNDecimalPlaces( deg * Math.PI / 180, 9 );

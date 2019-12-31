@@ -21,7 +21,7 @@ describe( 'Queue', () =>
         expect( result ).to.equal( 1 );
     } );
 
-    it( 'Long wait for a value does not crash node', async function ()
+    it( 'Long wait for a value does not crash Nodejs', async function ()
     {
         const longWait = 1000 * 60 * 2; // Two minute wait
         this.timeout( longWait + 500 );
@@ -32,7 +32,43 @@ describe( 'Queue', () =>
             testSubject.pushBack( 5 );
         }, longWait );
 
-        const poppedValue = await popPromise;
+        let poppedValue = null;
+
+        const caughtErrorCode = 3;
+        try
+        {
+            poppedValue = await popPromise;
+        } catch ( error )
+        {
+            poppedValue = caughtErrorCode;
+        }
+
+        console.log( `value gotted!` );
+
+        expect( poppedValue ).to.equal( caughtErrorCode );
+    } );
+
+    it( 'Short wait for a value (less than timeout) returns the value', async function ()
+    {
+        const shortWait = 450; // just under the time it takes for the Queue to time out
+        this.timeout( shortWait + 500 );
+        const popPromise = testSubject.popFront();
+
+        setTimeout( () =>
+        {
+            testSubject.pushBack( 5 );
+        }, shortWait );
+
+        let poppedValue = null;
+
+        const caughtErrorCode = 3;
+        try
+        {
+            poppedValue = await popPromise;
+        } catch ( error )
+        {
+            poppedValue = caughtErrorCode;
+        }
 
         console.log( `value gotted!` );
 

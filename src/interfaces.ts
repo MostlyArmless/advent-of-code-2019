@@ -18,6 +18,7 @@ export interface IComputer
 
 export enum LoggingLevel
 {
+    Off,
     Basic,
     Verbose
 }

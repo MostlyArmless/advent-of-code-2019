@@ -2,7 +2,8 @@ import { Coordinate } from "./Coord";
 import { Grid } from "./Grid";
 import { IoBuffer } from "./IoBuffer";
 import { IComputer, LoggingLevel } from "./interfaces";
-import { translateCoords } from "./CoordinateTranslator";
+import { translateCoords, convertRThetaToXy } from "./CoordinateTranslator";
+import * as fse from 'fs-extra';
 
 type CoordinateId = string;
 type Arrow = '^' | '<' | '>' | 'v';
@@ -33,9 +34,11 @@ export class PaintingRobot
     private visitsPerPanel: Map<CoordinateId, Color[]>;
     private position: Coordinate;
     private orientation: Arrow;
-    private radiusToDisplay: number;
+    private maxRadiusReached: number;
+    private thetaAtMaxRadius: number;
     private numMovesProcessed: number;
     private loggingLevel: LoggingLevel;
+    private numUniquePaintJobsApplied: number;
 
     constructor( computer: IComputer, camera: IoBuffer<bigint>, nextActions: IoBuffer<bigint>, program: bigint[], loggingLevel?: LoggingLevel )
     {
@@ -45,11 +48,13 @@ export class PaintingRobot
 
         this.computer.loadProgram( program );
         this.visitsPerPanel = new Map<CoordinateId, Color[]>();
-        this.radiusToDisplay = 5;
+        this.maxRadiusReached = 5;
+        this.thetaAtMaxRadius = 0;
         this.position = new Coordinate( 0, 0 );
         this.orientation = '^';
         this.numMovesProcessed = 0;
         this.loggingLevel = loggingLevel;
+        this.numUniquePaintJobsApplied = 0;
     }
 
     async paint(): Promise<void>
@@ -57,11 +62,21 @@ export class PaintingRobot
         this.camera.sendOutput( 0n ); // First thing we see is definitely going to be black, since the whole ship is black to start with.
 
         this.computer.runProgram();
-        this.drawState();
+        if ( this.loggingLevel >= LoggingLevel.Verbose )
+            this.drawState();
 
-        while ( this.computer.isRunning )
+        while ( true )
         {
-            const paintColorIndex = Number( await this.nextActions.getInput() );
+            let nextComputerOuput = null;
+            try
+            {
+                nextComputerOuput = await this.nextActions.getInput()
+            } catch ( error )
+            {
+                // We waited for the computer to give us an output but it never did (after some specified timeout), probably because it stopped running.
+                break;
+            }
+            const paintColorIndex = Number( nextComputerOuput );
             const paintColor = paintColorIndex === 0 ? Color.Black : Color.White;
             const direction = Number( await this.nextActions.getInput() );
 
@@ -71,14 +86,23 @@ export class PaintingRobot
             this.orientation = newOrientation;
             const colorOfNewPosition = this.getColorAtCurrentPosition();
 
-            this.radiusToDisplay = Math.max( this.radiusToDisplay, this.position.x, this.position.y );
+            if ( this.position.r > this.maxRadiusReached )
+            {
+                this.maxRadiusReached = this.position.r;
+                this.thetaAtMaxRadius = this.position.theta;
+            }
 
             this.numMovesProcessed++;
-            this.drawState();
+            if ( this.loggingLevel === LoggingLevel.Basic )
+            {
+                console.log( `Processed ${this.numMovesProcessed} moves` );
+            }
+
+            if ( this.loggingLevel >= LoggingLevel.Verbose )
+                this.drawState();
 
             this.camera.sendOutput( colorOfNewPosition === Color.Black ? 0n : 1n );
         }
-
     }
 
     private getColorAtCurrentPosition()
@@ -89,9 +113,26 @@ export class PaintingRobot
 
     private paintCurrentPosition( paintColor: Color )
     {
-        let colorsOnThisSquareSoFar = this.visitsPerPanel.has( this.position.getId() ) ? this.visitsPerPanel.get( this.position.getId() ) : [];
-        colorsOnThisSquareSoFar.push( paintColor );
-        this.visitsPerPanel.set( this.position.getId(), colorsOnThisSquareSoFar );
+        if ( this.visitsPerPanel.has( this.position.getId() ) )
+        {
+            // We've been here before
+            let colorsOnThisSquareSoFar = this.visitsPerPanel.get( this.position.getId() );
+            const currentColorOfThisSquare = colorsOnThisSquareSoFar[colorsOnThisSquareSoFar.length - 1];
+
+            if ( paintColor !== currentColorOfThisSquare )
+            {
+                this.numUniquePaintJobsApplied++;
+            }
+
+            colorsOnThisSquareSoFar.push( paintColor );
+            this.visitsPerPanel.set( this.position.getId(), colorsOnThisSquareSoFar );
+        }
+        else
+        {
+            // We've never been here before
+            this.numUniquePaintJobsApplied++;
+            this.visitsPerPanel.set( this.position.getId(), [paintColor] );
+        }
     }
 
     parseDirection( direction: number ): Direction
@@ -142,17 +183,22 @@ export class PaintingRobot
         return this.visitsPerPanel.size
     }
 
-    drawState(): void
+    getNumUniquePaintsApplied(): number
     {
-        if ( this.loggingLevel < LoggingLevel.Verbose )
-            return;
+        return this.numUniquePaintJobsApplied;
+    }
 
+    drawState( filename?: string ): void
+    {
         console.log( `State after ${this.numMovesProcessed} moves:` );
-        const grid = new Grid<string>( this.radiusToDisplay, this.radiusToDisplay, '.' );
+        const furthestPointReached = convertRThetaToXy( this.maxRadiusReached, this.thetaAtMaxRadius );
+        const minGridSize = 5;
+        const xGrid = Math.max( minGridSize, Math.abs( furthestPointReached.x ) + 1 );
+        const yGrid = Math.max( minGridSize, Math.abs( furthestPointReached.y ) + 1 );
+        const grid = new Grid<string>( Math.abs( yGrid ) * 2, Math.abs( xGrid ) * 2, '.' );
 
         // Define (0,0) to be in the middle
-        const offset = -Math.floor( ( this.radiusToDisplay + 1 ) / 2 );
-        const newOrigin = new Coordinate( offset, offset );
+        const newOrigin = new Coordinate( -xGrid, -yGrid );
         const positionTranslated = translateCoords( newOrigin, this.position );
 
         this.visitsPerPanel.forEach( ( colors, coordinateId ) =>
@@ -167,8 +213,17 @@ export class PaintingRobot
         } );
 
         grid.set( positionTranslated.y, positionTranslated.x, this.orientation ); // Draw after to make sure the robot always appears on top
+        const originColors = this.visitsPerPanel.get( '0,0' )
+        const finalOriginColor = originColors[originColors.length - 1] === Color.Black ? 'B' : 'W';
+        grid.set( yGrid, xGrid, finalOriginColor );
 
-        console.log( grid.toString( true ) );
-        console.log(); // Blank line for separation
+        if ( filename )
+        {
+            fse.writeFileSync( filename, grid.toString( true ).replace( / /g, '' ) );
+        }
+        else
+        {
+            console.log( grid.toString( true ) );
+        }
     }
 }
