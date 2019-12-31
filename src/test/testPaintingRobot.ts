@@ -115,4 +115,49 @@ describe( 'PaintingRobot', () =>
         expect( computer.outputs.length ).to.equal( 0 );
         expect( numPanelsPaintedAtLeastOnce ).to.equal( 10 );
     } );
+
+    it( 'Diagonal down & right', async () =>
+    {
+        computer.setOutputSequence( [
+            1n, 1n, // white, right
+            1n, 1n, // white, right
+            1n, 0n, // white, left
+            1n, 1n, // white, right
+            1n, 0n, // white, left
+            1n, 1n, // white, right
+            1n, 0n, // white, left
+            1n, 1n, // white, right
+            1n, 0n, // white, left
+            1n, 1n, // white, right
+            1n, 0n, // white, left
+        ] );
+
+        const robot = new PaintingRobot( computer, camera, nextActions, MockProgram, LoggingLevel.Off );
+
+        await robot.paint();
+        const numPanelsPaintedAtLeastOnce = robot.getNumPanelsPaintedAtLeastOnce();
+        robot.drawState();
+
+        expect( computer.outputs.length ).to.equal( 0 );
+        expect( numPanelsPaintedAtLeastOnce ).to.equal( 11 );
+    } );
+
+    it( 'Circle pattern', async () =>
+    {
+        computer.setOutputSequence( [
+            1n, 1n, // white, right
+            1n, 0n, // white, left
+            1n, 0n, // white, left
+            1n, 0n, // white, left
+        ] );
+
+        const robot = new PaintingRobot( computer, camera, nextActions, MockProgram, LoggingLevel.Off );
+
+        await robot.paint();
+        const numPanelsPaintedAtLeastOnce = robot.getNumPanelsPaintedAtLeastOnce();
+        robot.drawState();
+
+        expect( computer.outputs.length ).to.equal( 0 );
+        expect( numPanelsPaintedAtLeastOnce ).to.equal( 4 );
+    } );
 } );
