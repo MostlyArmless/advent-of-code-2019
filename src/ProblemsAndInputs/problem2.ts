@@ -5,7 +5,7 @@ import { ConsoleStdOut } from '../ConsoleStdOut';
 
 const input = readProblemTextAsBigIntArray( './src/ProblemsAndInputs/problem2input.txt' );
 
-async function problem2()
+export async function problem2(): Promise<number>
 {
     const enableLogging = false;
     const computer = new IntCodeComputer(
@@ -28,7 +28,9 @@ async function problem2()
         actualOutput = await computer.runProgram();
     }
 
-    console.log( `DONE. arg1 = ${arg1}, arg2 = ${arg2}. Problem answer = ${100 * arg1 + arg2}` );
+    const answer = 100 * arg1 + arg2;
+    console.log( `DONE. arg1 = ${arg1}, arg2 = ${arg2}. Problem answer = ${answer}` );
+    return answer;
 }
 
 function TryNewArgs( arg1: number, arg2: number )

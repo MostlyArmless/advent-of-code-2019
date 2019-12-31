@@ -54,7 +54,7 @@ function hasMonotonicallyIncreasingDigits( s: string ): boolean
     return true;
 }
 
-function problem4a()
+export function problem4a(): number
 {
     let validPasswords: number[] = [];
 
@@ -67,10 +67,12 @@ function problem4a()
         }
     }
 
-    console.log( `Found ${validPasswords.length} valid passwords between ${pwMinVal} and ${pwMaxVal}` );
+    const answer = validPasswords.length;
+    console.log( `Found ${answer} valid passwords between ${pwMinVal} and ${pwMaxVal}` );
+    return answer;
 }
 
-function problem4b()
+export function problem4b(): number
 {
     let validPasswords: number[] = [];
 
@@ -82,8 +84,9 @@ function problem4b()
             validPasswords.push( pw );
         }
     }
-
-    console.log( `Found ${validPasswords.length} valid passwords between ${pwMinVal} and ${pwMaxVal}` );
+    const answer = validPasswords.length;
+    console.log( `Found ${answer} valid passwords between ${pwMinVal} and ${pwMaxVal}` );
+    return answer;
 }
 
 measureExecutionTime( problem4a );

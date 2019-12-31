@@ -4,7 +4,7 @@ import * as fs from 'fs';
 
 export interface ExecutionTimerResult
 {
-    runtime: number;
+    runtimeSeconds: number;
     functionOutput: any;
 }
 
@@ -32,7 +32,7 @@ export async function measureExecutionTime( func: Function, args?: any[], numIte
         console.log( `runtime of ${func.name} = ${duration[0]}.${duration[1]} s` );
 
         return {
-            runtime: parseFloat( `${duration[0]}.${duration[1]}` ),
+            runtimeSeconds: parseFloat( `${duration[0]}.${duration[1]}` ),
             functionOutput: functionRetVal
         };
     }
@@ -67,7 +67,7 @@ export async function measureExecutionTime( func: Function, args?: any[], numIte
         console.log( `average runtime after ${numIterations} iterations = ${avgDuration} s` );
 
         return {
-            runtime: avgDuration,
+            runtimeSeconds: avgDuration,
             functionOutput: functionRetVal
         };
     }

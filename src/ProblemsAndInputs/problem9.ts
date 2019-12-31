@@ -3,11 +3,11 @@ import { IntCodeComputer } from "../IntCodeComputer";
 import { MockStdIn } from "../Mocks/MockStdIn";
 import { MockStdOut } from "../Mocks/MockStdOut";
 
-const problem9input: bigint[] = readProblemTextAsBigIntArray( './src/problem9input.txt' );
+const problem9input: bigint[] = readProblemTextAsBigIntArray( './src/ProblemsAndInputs/problem9input.txt' );
 
-async function problem9a()
+export async function problem9a(): Promise<bigint>
 {
-    const mockStdIn = new MockStdIn<bigint>( [1n] );
+    const mockStdIn = new MockStdIn<bigint>( [ 1n ] );
     const mockStdOut = new MockStdOut<bigint>();
     const computer = new IntCodeComputer( mockStdIn, mockStdOut, false );
 
@@ -15,12 +15,14 @@ async function problem9a()
     await computer.runProgram();
 
     console.log( mockStdOut.outputs );
-    console.log( `Answer to problem 9 = ${mockStdOut.outputs[0]}` );
+    const answer = mockStdOut.outputs[ 0 ];
+    console.log( `Answer to problem 9 = ${answer}` );
+    return answer;
 }
 
-async function problem9b()
+export async function problem9b(): Promise<bigint>
 {
-    const mockStdIn = new MockStdIn<bigint>( [2n] );
+    const mockStdIn = new MockStdIn<bigint>( [ 2n ] );
     const mockStdOut = new MockStdOut<bigint>();
     const computer = new IntCodeComputer( mockStdIn, mockStdOut, false );
 
@@ -28,7 +30,9 @@ async function problem9b()
     await computer.runProgram();
 
     console.log( mockStdOut.outputs );
-    console.log( `Answer to problem 9 = ${mockStdOut.outputs[0]}` );
+    const answer = mockStdOut.outputs[ 0 ];
+    console.log( `Answer to problem 9 = ${answer}` );
+    return answer;
 }
 
 measureExecutionTime( problem9a );
