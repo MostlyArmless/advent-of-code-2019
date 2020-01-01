@@ -1,9 +1,9 @@
 import { IntCodeComputer } from '../IntCodeComputer'
-import { measureExecutionTime, readProblemTextAsBigIntArray } from '../tools';
+import { measureExecutionTime, readFileAsBigIntArray } from '../tools';
 import { HumanInputRetriever } from '../HumanInputRetriever';
 import { ConsoleStdOut } from '../ConsoleStdOut';
 
-const input = readProblemTextAsBigIntArray( './src/ProblemsAndInputs/problem2input.txt' );
+const input = readFileAsBigIntArray( './src/ProblemsAndInputs/problem2input.txt' );
 
 export async function problem2(): Promise<number>
 {

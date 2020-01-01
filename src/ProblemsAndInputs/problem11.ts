@@ -1,10 +1,10 @@
-import { readProblemTextAsBigIntArray, measureExecutionTime } from "../tools";
+import { readFileAsBigIntArray, measureExecutionTime } from "../tools";
 import { PaintingRobot } from "../PaintingRobot";
 import { IoBuffer } from "../IoBuffer";
 import { IntCodeComputer } from "../IntCodeComputer";
 import { LoggingLevel } from "../interfaces";
 
-const problem11input = readProblemTextAsBigIntArray( './src/ProblemsAndInputs/problem11input.txt' );
+const problem11input = readFileAsBigIntArray( './src/ProblemsAndInputs/problem11input.txt' );
 
 export async function problem11a(): Promise<number>
 {

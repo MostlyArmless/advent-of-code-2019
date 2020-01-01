@@ -1,9 +1,9 @@
-import { measureExecutionTime, readProblemTextAsBigIntArray } from "../tools";
+import { measureExecutionTime, readFileAsBigIntArray } from "../tools";
 import { IntCodeComputer } from "../IntCodeComputer";
 import { MockStdIn } from "../Mocks/MockStdIn";
 import { MockStdOut } from "../Mocks/MockStdOut";
 
-const testDiagnosticProgram = readProblemTextAsBigIntArray( './src/ProblemsAndInputs/problem5input.txt' );
+const testDiagnosticProgram = readFileAsBigIntArray( './src/ProblemsAndInputs/problem5input.txt' );
 
 const enableLogging = false;
 

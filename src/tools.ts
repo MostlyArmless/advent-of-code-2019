@@ -130,7 +130,7 @@ export function BigIntToNum( arr: bigint[] ): number[]
     return output;
 }
 
-export function readProblemTextAsBigIntArray( filename: string ): bigint[]
+export function readFileAsBigIntArray( filename: string ): bigint[]
 {
     let output: bigint[] = [];
 
