@@ -1,7 +1,7 @@
 // Test framework dependencies
 const expect = require( 'chai' ).expect;
 import * as chai from 'chai';
-import { convertXyToRTheta, translateCoords } from '../CoordinateTranslator';
+import { convertRectToPolar, translateCoords } from '../CoordinateTranslator';
 import { Coordinate } from '../Coord';
 chai.use( require( 'chai-as-promised' ) ); // Extension that defines the "eventually" keyword
 chai.use( require( 'chai-string' ) ); // Extension that provides the "string should contain" functionality
@@ -14,7 +14,7 @@ describe( 'Coordinate Translator', () =>
     {
         it( 'Quadrant 1', () =>
         {
-            const { r, theta } = convertXyToRTheta( 1, Math.sqrt( 3 ) );
+            const { r, theta } = convertRectToPolar( 1, Math.sqrt( 3 ) );
             expect( r ).to.almost.equal( 2 );
             expect( theta ).to.almost.equal( 60 );
         } );
