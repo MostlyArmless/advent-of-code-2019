@@ -1,4 +1,4 @@
-import { ImageDecoder } from "../ImageDecoder";
+import { ImageDecoder } from "../src/ImageDecoder";
 
 // Test framework dependencies
 const expect = require( 'chai' ).expect;

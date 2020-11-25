@@ -1,4 +1,4 @@
-import { blankGrid, copyGrid } from "../Grid";
+import { blankGrid, copyGrid } from "../src/Grid";
 
 // Test framework dependencies
 const expect = require( 'chai' ).expect;

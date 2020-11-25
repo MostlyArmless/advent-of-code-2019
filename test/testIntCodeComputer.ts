@@ -1,9 +1,9 @@
 // Test framework dependencies
 const expect = require( 'chai' ).expect;
-import { IntCodeComputer } from '../IntCodeComputer';
-import { MockStdIn } from '../Mocks/MockStdIn';
-import { MockStdOut } from '../Mocks/MockStdOut';
-import { BigIntToNum, readFileAsBigIntArray } from '../tools';
+import { IntCodeComputer } from '../src/IntCodeComputer';
+import { MockStdIn } from '../src/Mocks/MockStdIn';
+import { MockStdOut } from '../src/Mocks/MockStdOut';
+import { BigIntToNum, readFileAsBigIntArray } from '../src/tools';
 
 describe( 'IntCodeComputer', () =>
 {

@@ -1,6 +1,6 @@
 // Test framework dependencies
 const expect = require( 'chai' ).expect;
-import { AsteroidDetector } from '../AsteroidDetector';
+import { AsteroidDetector } from '../src/AsteroidDetector';
 
 describe( 'AsteroidDetector', () =>
 {

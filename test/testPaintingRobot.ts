@@ -1,10 +1,10 @@
 const expect = require( 'chai' ).expect;
 
-import { IoBuffer } from "../IoBuffer";
-import { PaintingRobot } from "../PaintingRobot";
-import { MockComputer } from "./MockComputer";
-import { MockProgram } from "./Mocks";
-import { LoggingLevel } from "../interfaces";
+import { IoBuffer } from "../src/IoBuffer";
+import { PaintingRobot } from "../src/PaintingRobot";
+import { MockComputer } from "../src/Mocks/MockComputer";
+import { MockProgram } from "../src/Mocks/Mocks";
+import { LoggingLevel } from "../src/interfaces";
 
 describe( 'PaintingRobot', () =>
 {

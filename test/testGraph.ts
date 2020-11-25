@@ -1,7 +1,7 @@
 // Test framework dependencies
 const expect = require( 'chai' ).expect;
 import * as chai from 'chai';
-import { Graph } from '../Graph';
+import { Graph } from '../src/Graph';
 chai.use( require( 'chai-as-promised' ) ); // Extension that defines the "eventually" keyword
 chai.use( require( 'chai-string' ) ); // Extension that provides the "string should contain" functionality
 

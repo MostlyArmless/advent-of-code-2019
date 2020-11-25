@@ -1,4 +1,4 @@
-import { Grid } from "../Grid";
+import { Grid } from "../src/Grid";
 import { expect } from "chai";
 
 

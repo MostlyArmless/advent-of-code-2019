@@ -1,8 +1,8 @@
 // Test framework dependencies
 const expect = require( 'chai' ).expect;
 import * as chai from 'chai';
-import { convertXyToRTheta, translateCoords } from '../CoordinateTranslator';
-import { Coordinate } from '../Coord';
+import { convertXyzToRThetaPhi, translateCoords } from '../src/CoordinateTranslator';
+import { Coordinate } from '../src/Coord';
 chai.use( require( 'chai-as-promised' ) ); // Extension that defines the "eventually" keyword
 chai.use( require( 'chai-string' ) ); // Extension that provides the "string should contain" functionality
 const chaiAlmost = require( 'chai-almost' );
@@ -12,11 +12,19 @@ describe( 'Coordinate Translator', () =>
 {
     describe( 'Rectangular to Polar coordinate conversion', () =>
     {
-        it( 'Quadrant 1', () =>
+        it( 'Polar', () =>
         {
-            const { r, theta } = convertXyToRTheta( 1, Math.sqrt( 3 ) );
+            const { r, theta } = convertXyzToRThetaPhi( 1, Math.sqrt( 3 ), 0 );
             expect( r ).to.almost.equal( 2 );
             expect( theta ).to.almost.equal( 60 );
+        } );
+
+        it( 'Spherical', () =>
+        {
+            const { r, theta, phi } = convertXyzToRThetaPhi( 1, 1, 1 );
+            expect( r ).to.almost.equal( Math.sqrt( 3 ) );
+            expect( theta ).to.almost.equal( Math.asin( Math.sqrt( 2 / 3 ) * 180 / Math.PI ) );
+            expect( phi ).to.almost.equal( 45 );
         } );
     } );
 

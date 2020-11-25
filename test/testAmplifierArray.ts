@@ -1,6 +1,6 @@
 // Test framework dependencies
 const expect = require( 'chai' ).expect;
-import { AmplifierArray } from '../AmplifierArray';
+import { AmplifierArray } from '../src/AmplifierArray';
 
 describe( 'AmplifierArray', () =>
 {

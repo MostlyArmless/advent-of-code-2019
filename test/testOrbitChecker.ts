@@ -1,6 +1,6 @@
 // Test framework dependencies
 const expect = require( 'chai' ).expect;
-import { OrbitLengthChecker } from '../OrbitLengthChecker';
+import { OrbitLengthChecker } from '../src/OrbitLengthChecker';
 import * as shuffle from 'shuffle-array';
 
 describe( 'OrbitChecker', () =>
