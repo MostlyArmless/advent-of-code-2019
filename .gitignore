@@ -4,3 +4,5 @@
 /build/
 scratch.*s
 **/**/robotPainting.txt
+/coverage/
+*.nyc*
