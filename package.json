@@ -8,7 +8,8 @@
   },
   "scripts": {
     "start": "node ./build/main.js",
-    "test": "mocha \"./build/test/*.js\""
+    "test": "mocha \"./build/test/*.js\"",
+    "clean": "node ./scripts/clean.js"
   },
   "repository": {
     "type": "git",
