@@ -11,27 +11,27 @@ export function translateCoords( newOrigin: Coordinate, pointToTranslate: Coordi
     return translatedPoint;
 }
 
-export function convertRectToPolar( x: number, y: number, z?: number ): { r: number, theta: number, phi: number }
+export function convertXyzToRThetaPhi( x: number, y: number, z: number = 0 ): { r: number, theta: number, phi: number }
 {
-    z = z === undefined ? 0 : z;
-
     const r = roundToNDecimalPlaces( Math.sqrt( x ** 2 + y ** 2 + z ** 2 ), 9 );
+
     return {
         r: r,
         theta: roundToNDecimalPlaces( Math.atan2( y, x ) * 180 / Math.PI, 9 ),
-        phi: Math.acos( z / r )
+        phi: Math.acos( z / r ) * 180 / Math.PI
     }
 }
 
-export function convertPolarToRect( r: number, thetaDegrees: number, phiDegrees?: number ): { x: number, y: number, z: number }
+export function convertRThetaPhiToXyz( r: number, thetaDegrees: number, phiDegrees: number = 90 ): { x: number, y: number, z: number }
 {
-    phiDegrees = phiDegrees === undefined ? 0 : phiDegrees;
+    const thetaRad = thetaDegrees * Math.PI / 180;
+    const phiRad = phiDegrees * Math.PI / 180;
 
     return {
-        x: roundToNDecimalPlaces( r * Math.sin( thetaDegrees * Math.PI / 180 ) * Math.cos( phiDegrees * Math.PI / 180 ), 9 ),
-        y: roundToNDecimalPlaces( r * Math.sin( thetaDegrees * Math.PI / 180 ) * Math.sin( phiDegrees * Math.PI / 180 ), 9 ),
-        z: roundToNDecimalPlaces( r * Math.cos( thetaDegrees * Math.PI / 180 ), 9 )
-    }
+        x: roundToNDecimalPlaces( r * Math.sin( phiRad ) * Math.cos( thetaRad ), 9 ),
+        y: roundToNDecimalPlaces( r * Math.sin( phiRad ) * Math.sin( thetaRad ), 9 ),
+        z: r * Math.cos( phiRad )
+    };
 }
 
 export function convertDegreesToRadians( deg: number ): number

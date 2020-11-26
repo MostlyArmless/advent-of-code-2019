@@ -2,7 +2,7 @@ import { Coordinate } from "./Coord";
 import { Grid } from "./Grid";
 import { IoBuffer } from "./IoBuffer";
 import { IComputer, LoggingLevel } from "./interfaces";
-import { translateCoords, convertPolarToRect } from "./CoordinateTranslator";
+import { translateCoords, convertRThetaPhiToXyz } from "./CoordinateTranslator";
 import * as fse from 'fs-extra';
 
 type CoordinateId = string;
@@ -50,7 +50,7 @@ export class PaintingRobot
         this.computer.reset();
         this.computer.loadProgram( program );
         this.visitsPerPanel = new Map<CoordinateId, Color[]>();
-        this.maxRadiusReached = 5;
+        this.maxRadiusReached = 0;
         this.thetaAtMaxRadius = 0;
         this.position = new Coordinate( 0, 0 );
         this.orientation = '^';
@@ -201,10 +201,13 @@ export class PaintingRobot
     drawState( filename?: string ): void
     {
         console.log( `State after ${this.numMovesProcessed} moves:` );
-        const furthestPointReached = convertPolarToRect( this.maxRadiusReached, this.thetaAtMaxRadius );
+        const furthestPointReached = convertRThetaPhiToXyz( this.maxRadiusReached, this.thetaAtMaxRadius );
         const minGridSize = 5;
-        const xGrid = Math.max( minGridSize, Math.abs( furthestPointReached.x ) + 1 );
-        const yGrid = Math.max( minGridSize, Math.abs( furthestPointReached.y ) + 1 );
+        if ( this.loggingLevel >= LoggingLevel.Verbose )
+            console.log( `Furthest point reached: rtheta = (${this.maxRadiusReached},${this.thetaAtMaxRadius}), xy = (${furthestPointReached.x},${furthestPointReached.y})` );
+
+        const xGrid = Math.max( minGridSize, 2 * Math.abs( furthestPointReached.x ) + 1 );
+        const yGrid = Math.max( minGridSize, 2 * Math.abs( furthestPointReached.y ) + 1 );
         const grid = new Grid<string>( Math.abs( yGrid ) * 2, Math.abs( xGrid ) * 2, '.' );
 
         // Define (0,0) to be in the middle

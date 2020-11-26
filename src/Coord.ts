@@ -1,27 +1,28 @@
-import { convertRectToPolar } from "./CoordinateTranslator";
+import { convertXyzToRThetaPhi } from "./CoordinateTranslator";
 
 export class Coordinate
 {
     x: number;
     y: number;
     z: number;
+
     r: number;
     theta: number;
     phi: number;
+
     private id: string;
 
-    constructor( x: number, y: number, z?: number )
+    constructor( x: number, y: number, z: number = 0 )
     {
         this.x = x;
         this.y = y;
-        this.z = z === undefined ? 0 : z;
-
-        this.updatePolarAndId( x, y, z );
+        this.z = z;
+        this.updatePolarCoordsAndId( this.x, this.y, this.z );
     }
 
-    private updatePolarAndId( x: number, y: number, z: number )
+    private updatePolarCoordsAndId( x: number, y: number, z: number = 0 )
     {
-        const { r, theta, phi } = convertRectToPolar( x, y, z );
+        const { r, theta, phi } = convertXyzToRThetaPhi( x, y, z );
         this.r = r;
         this.theta = theta;
         this.phi = phi;
@@ -34,12 +35,12 @@ export class Coordinate
         return this.id;
     }
 
-    move( dx: number, dy: number, dz?: number ): void
+    move( dx: number, dy: number, dz: number = 0 ): void
     {
         this.x += dx;
         this.y += dy;
-        this.z += dz === undefined ? 0 : dz;
+        this.z += dz;
 
-        this.updatePolarAndId( this.x, this.y, this.z );
+        this.updatePolarCoordsAndId( this.x, this.y, this.z );
     }
 }
