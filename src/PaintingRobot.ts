@@ -2,7 +2,7 @@ import { Coordinate } from "./Coord";
 import { Grid } from "./Grid";
 import { IoBuffer } from "./IoBuffer";
 import { IComputer, LoggingLevel } from "./interfaces";
-import { translateCoords, convertRThetaToXy } from "./CoordinateTranslator";
+import { translateCoords, convertPolarToRect } from "./CoordinateTranslator";
 import * as fse from 'fs-extra';
 
 type CoordinateId = string;
@@ -201,7 +201,7 @@ export class PaintingRobot
     drawState( filename?: string ): void
     {
         console.log( `State after ${this.numMovesProcessed} moves:` );
-        const furthestPointReached = convertRThetaToXy( this.maxRadiusReached, this.thetaAtMaxRadius );
+        const furthestPointReached = convertPolarToRect( this.maxRadiusReached, this.thetaAtMaxRadius );
         const minGridSize = 5;
         const xGrid = Math.max( minGridSize, Math.abs( furthestPointReached.x ) + 1 );
         const yGrid = Math.max( minGridSize, Math.abs( furthestPointReached.y ) + 1 );
