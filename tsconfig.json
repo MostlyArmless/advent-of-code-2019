@@ -12,7 +12,9 @@
     "outDir": "./build"
   },
   "typeAcquisition": {
-    "include": ["src/**/*.ts"],
-    "exclude": ["node_modules"]
+    "exclude": [
+      "coverage",
+      "node_modules"
+    ]
   }
 }
