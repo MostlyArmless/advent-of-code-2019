@@ -18,9 +18,8 @@ export async function problem11a(): Promise<number>
     await robot.paint();
     robot.drawState( './robotPainting.txt' );
     const numPanelsPaintedAtLeastOnce = robot.getNumPanelsPaintedAtLeastOnce();
-    const otherCount = robot.getNumPanelsVisited();
 
     const answer = numPanelsPaintedAtLeastOnce;
-    console.log( `Answer to problem 11a = ${numPanelsPaintedAtLeastOnce}, but it might be = ${otherCount}` );
+    console.log( `Answer to problem 11a = ${numPanelsPaintedAtLeastOnce}` );
     return answer;
 }

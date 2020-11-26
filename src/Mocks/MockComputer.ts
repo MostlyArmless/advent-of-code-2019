@@ -36,6 +36,9 @@ export class MockComputer implements IComputer
             this.receivedInputs.push( input );
             for ( let i = 0; i < this.outputsToSendAfterEachInput; i++ )
             {
+                if ( this.outputs.length === 0 )
+                    break; // We try to send N outputs per input, but if we haven't been given enough points then just stop
+
                 this.stdOut.sendOutput( this.outputs.shift() );
             }
         }
