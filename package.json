@@ -7,7 +7,7 @@
     "advent-of-code-2019": "./build/main.js"
   },
   "scripts": {
-    "start": "node ./build/main.js",
+    "start": "node ./build/src/main.js",
     "test": "mocha \"./build/test/*.js\"",
     "clean": "node ./scripts/clean.js"
   },
