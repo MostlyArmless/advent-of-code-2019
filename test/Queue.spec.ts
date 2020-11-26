@@ -50,7 +50,7 @@ describe( 'Queue', () =>
 
     it( 'Short wait for a value (less than timeout) returns the value', async function ()
     {
-        const shortWait = testSubject.timeoutMilliseconds - 50; // just under the time it takes for the Queue to time out
+        const shortWait = testSubject.timeoutMilliseconds - 1; // just under the time it takes for the Queue to time out
         this.timeout( shortWait + 50 ); // Make sure the test doesn't time out before we're done waiting
         const popPromise = testSubject.popFront();
 
@@ -70,7 +70,7 @@ describe( 'Queue', () =>
             poppedValue = caughtErrorCode;
         }
 
-        console.log( `value gotted!` );
+        console.log( `value gotted: ${poppedValue}` );
 
         expect( poppedValue ).to.equal( 5 );
     } );
