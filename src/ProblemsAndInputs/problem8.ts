@@ -1,4 +1,3 @@
-import { measureExecutionTime } from "../tools";
 import { problem8input } from './problem8input';
 import { ImageDecoder } from "../ImageDecoder";
 
@@ -21,6 +20,3 @@ export function problem8b()
     imageDecoder.saveImageToFile();
     console.log( `Check the file for the answer to problem 8b.` );
 }
-
-measureExecutionTime( problem8a );
-measureExecutionTime( problem8b );

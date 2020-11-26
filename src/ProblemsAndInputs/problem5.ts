@@ -1,4 +1,4 @@
-import { measureExecutionTime, readFileAsBigIntArray } from "../tools";
+import { readFileAsBigIntArray } from "../tools";
 import { IntCodeComputer } from "../IntCodeComputer";
 import { MockStdIn } from "../Mocks/MockStdIn";
 import { MockStdOut } from "../Mocks/MockStdOut";
@@ -39,6 +39,3 @@ export async function problem5b(): Promise<bigint>
     console.log( `Problem 5b answer = ${answer}` );
     return answer[0];
 }
-
-measureExecutionTime( problem5a );
-measureExecutionTime( problem5b );

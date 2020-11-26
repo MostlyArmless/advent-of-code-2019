@@ -1,5 +1,5 @@
 import { IntCodeComputer } from '../IntCodeComputer'
-import { measureExecutionTime, readFileAsBigIntArray } from '../tools';
+import { readFileAsBigIntArray } from '../tools';
 import { HumanInputRetriever } from '../HumanInputRetriever';
 import { ConsoleStdOut } from '../ConsoleStdOut';
 
@@ -48,6 +48,3 @@ function TryNewArgs( arg1: number, arg2: number )
     }
     return { arg1, arg2 };
 }
-
-
-measureExecutionTime( problem2 );

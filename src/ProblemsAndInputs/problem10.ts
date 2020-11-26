@@ -1,4 +1,4 @@
-import { measureExecutionTime, readFileAsArrayOfLines } from "../tools";
+import { readFileAsArrayOfLines } from "../tools";
 import { AsteroidDetector } from "../AsteroidDetector";
 
 const problem10input = readFileAsArrayOfLines( './src/ProblemsAndInputs/problem10input.txt' );
@@ -25,6 +25,3 @@ export function problem10b(): number
     console.log( `Answer to problem 10b = ${answer}` );
     return answer;
 }
-
-measureExecutionTime( problem10a );
-measureExecutionTime( problem10b );

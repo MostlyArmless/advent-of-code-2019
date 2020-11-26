@@ -1,4 +1,4 @@
-import { readFileAsBigIntArray, measureExecutionTime } from "../tools";
+import { readFileAsBigIntArray } from "../tools";
 import { PaintingRobot } from "../PaintingRobot";
 import { IoBuffer } from "../IoBuffer";
 import { IntCodeComputer } from "../IntCodeComputer";
@@ -23,5 +23,3 @@ export async function problem11a(): Promise<number>
     console.log( `Answer to problem 11a = ${numPanelsPaintedAtLeastOnce}, but it might be = ${otherCount}` );
     return answer;
 }
-
-measureExecutionTime( problem11a );

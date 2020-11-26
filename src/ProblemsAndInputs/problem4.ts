@@ -1,4 +1,3 @@
-import { measureExecutionTime } from "../tools";
 
 const pwMinVal = 138241;
 const pwMaxVal = 674034;
@@ -88,6 +87,3 @@ export function problem4b(): number
     console.log( `Found ${answer} valid passwords between ${pwMinVal} and ${pwMaxVal}` );
     return answer;
 }
-
-measureExecutionTime( problem4a );
-measureExecutionTime( problem4b );

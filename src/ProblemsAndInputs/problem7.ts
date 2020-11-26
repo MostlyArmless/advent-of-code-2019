@@ -1,4 +1,3 @@
-import { measureExecutionTime } from "../tools";
 import { problem7input } from './problem7input';
 import { AmplifierArray } from "../AmplifierArray";
 
@@ -25,6 +24,3 @@ export async function problem7b(): Promise<bigint>
     console.log( `Problem 7b answer:\nMax output = ${maxOutput}, at phase sequence = ${bestPhaseSequence}` );
     return maxOutput;
 }
-
-measureExecutionTime( problem7a );
-measureExecutionTime( problem7b );
