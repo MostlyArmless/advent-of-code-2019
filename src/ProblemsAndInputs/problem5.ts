@@ -2,6 +2,7 @@ import { readFileAsBigIntArray } from "../tools";
 import { IntCodeComputer } from "../IntCodeComputer";
 import { MockStdIn } from "../Mocks/MockStdIn";
 import { MockStdOut } from "../Mocks/MockStdOut";
+import { Memory } from "../Memory";
 
 const testDiagnosticProgram = readFileAsBigIntArray( './src/ProblemsAndInputs/problem5input.txt' );
 
@@ -12,6 +13,7 @@ export async function problem5a(): Promise<bigint>
     const airConditionerSystemId = 1n;
     const mockStdOut = new MockStdOut<bigint>();
     const computer = new IntCodeComputer(
+        new Memory(),
         new MockStdIn( [airConditionerSystemId] ),
         mockStdOut,
         enableLogging );
@@ -29,6 +31,7 @@ export async function problem5b(): Promise<bigint>
     const thermalRadiatorControllerId = 5n;
     const mockStdOut = new MockStdOut<bigint>();
     const computer = new IntCodeComputer(
+        new Memory(),
         new MockStdIn( [thermalRadiatorControllerId] ),
         mockStdOut,
         enableLogging );

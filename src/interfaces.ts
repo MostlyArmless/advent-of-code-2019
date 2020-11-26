@@ -22,3 +22,14 @@ export enum LoggingLevel
     Basic,
     Verbose
 }
+
+export type Vector = [number, number, number];
+
+export interface IMemory
+{
+    loadProgram( program: number[] | bigint[] ): void;
+    reset(): void;
+    load( address: bigint ): bigint;
+    store( address: bigint, value: bigint ): void;
+    dumpRamOnly(): bigint[];
+}

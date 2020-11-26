@@ -1,5 +1,4 @@
-import { IStdIn, IStdOut, IComputer } from './interfaces';
-import { Memory } from './Memory';
+import { IStdIn, IStdOut, IComputer, IMemory } from './interfaces';
 import { InstructionParser } from './InstructionParser';
 
 export enum ParamMode
@@ -35,7 +34,7 @@ export interface IInstruction
 export class IntCodeComputer implements IComputer
 {
     enableLogging: boolean = false;
-    memory: Memory;
+    memory: IMemory;
     pos: bigint;
     isRunning: boolean;
     params: bigint[];
@@ -48,20 +47,21 @@ export class IntCodeComputer implements IComputer
     relativeBase: bigint;
     instructionParser: InstructionParser;
 
-    constructor( stdIn: IStdIn<bigint>, stdOut: IStdOut<bigint>, enableLogging?: boolean, id?: number )
+    constructor( memory: IMemory, stdIn: IStdIn<bigint>, stdOut: IStdOut<bigint>, enableLogging?: boolean, id?: number )
     {
         if ( enableLogging != undefined )
             this.enableLogging = enableLogging;
 
-        this.reset();
+        this.memory = memory;
         this.stdIn = stdIn;
         this.stdOut = stdOut;
+        this.reset();
         this.id = id === undefined ? 0 : id;
     }
 
     reset(): void
     {
-        this.memory = new Memory();
+        this.memory.reset();
         this.pos = 0n;
         this.isRunning = true;
         this.params = [null, null, null, null];
@@ -236,7 +236,8 @@ export class IntCodeComputer implements IComputer
         }
 
         this.log( `Finished running after ${this.numInstructionsProcessed} steps.` );
-        this.log( `Final memory state = ${this.memory.dumpRamOnly()}` );
+        if ( this.enableLogging ) // For performance reasons we double check the flag here to avoid caling dumpRamOnly() unnecessarily.
+            this.log( `Final memory state = ${this.memory.dumpRamOnly()}` );
         this.log( `Result = ${this.memory.load( 0n )}` );
         return this.memory.load( 0n );
     }

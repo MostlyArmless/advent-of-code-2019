@@ -1,13 +1,13 @@
 import { IInstruction, OpCode, ParamMode } from "./IntCodeComputer";
-import { Memory } from "./Memory";
 import { GetInstructionInfo } from "./InstructionInfoRetriever";
+import { IMemory } from "./interfaces";
 
 export class InstructionParser
 {
-    memory: Memory;
+    memory: IMemory;
     enableLogging: boolean;
 
-    constructor( memory: Memory, enableLogging: boolean )
+    constructor( memory: IMemory, enableLogging: boolean )
     {
         this.memory = memory;
         this.enableLogging = enableLogging;

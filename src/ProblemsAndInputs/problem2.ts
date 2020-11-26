@@ -2,13 +2,15 @@ import { IntCodeComputer } from '../IntCodeComputer'
 import { readFileAsBigIntArray } from '../tools';
 import { HumanInputRetriever } from '../HumanInputRetriever';
 import { ConsoleStdOut } from '../ConsoleStdOut';
+import { IMemory } from '../interfaces';
 
 const input = readFileAsBigIntArray( './src/ProblemsAndInputs/problem2input.txt' );
 
-export async function problem2(): Promise<number>
+export async function problem2( memory: IMemory ): Promise<number>
 {
     const enableLogging = false;
     const computer = new IntCodeComputer(
+        memory,
         new HumanInputRetriever(),
         new ConsoleStdOut(),
         enableLogging );
@@ -29,7 +31,7 @@ export async function problem2(): Promise<number>
     }
 
     const answer = 100 * arg1 + arg2;
-    console.log( `DONE. arg1 = ${arg1}, arg2 = ${arg2}. Problem answer = ${answer}` );
+    console.log( `DONE. arg1 = ${arg1}, arg2 = ${arg2}. Problem 2 answer = ${answer}` );
     return answer;
 }
 

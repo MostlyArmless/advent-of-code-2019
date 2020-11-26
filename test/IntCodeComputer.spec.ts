@@ -1,6 +1,7 @@
 // Test framework dependencies
 const expect = require( 'chai' ).expect;
 import { IntCodeComputer } from '../src/IntCodeComputer';
+import { Memory } from '../src/Memory';
 import { MockStdIn } from '../src/Mocks/MockStdIn';
 import { MockStdOut } from '../src/Mocks/MockStdOut';
 import { BigIntToNum, readFileAsBigIntArray } from '../src/tools';
@@ -16,7 +17,7 @@ describe( 'IntCodeComputer', () =>
     {
         m_mockStdIn = new MockStdIn( null );
         m_mockStdOut = new MockStdOut();
-        m_testSubject = new IntCodeComputer( m_mockStdIn, m_mockStdOut, enableLogging );
+        m_testSubject = new IntCodeComputer( new Memory(), m_mockStdIn, m_mockStdOut, enableLogging );
     } );
 
     describe( "ADD and MULTIPLY", () =>
@@ -101,7 +102,7 @@ describe( 'IntCodeComputer', () =>
             const inputValue = 69n;
             const mockInputRetriever = new MockStdIn( [inputValue] );
             const mockStdOut = new MockStdOut();
-            let m_testSubject = new IntCodeComputer( mockInputRetriever, mockStdOut, enableLogging );
+            let m_testSubject = new IntCodeComputer( new Memory(), mockInputRetriever, mockStdOut, enableLogging );
 
             m_testSubject.enableLogging = true;
             m_testSubject.loadProgram( [3, 0, 4, 0, 99] );

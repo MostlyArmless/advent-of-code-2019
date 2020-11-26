@@ -1,4 +1,6 @@
-export class Memory
+import { IMemory } from "./interfaces";
+
+export class Memory implements IMemory
 {
     private ram: bigint[]; // Use an array to store values where the address can be indexed by a normal Number
     private bigram: Map<bigint, bigint>; // Use a map to index those addresses which can only be expressed as a bigint
@@ -85,5 +87,48 @@ export class Memory
         {
             this.bigram.set( address, value );
         }
+    }
+}
+
+export class MapMemory implements IMemory
+{
+    private ram: Map<bigint, bigint>;
+
+    constructor()
+    {
+        this.reset();
+    }
+
+    reset(): void
+    {
+        this.ram = new Map<bigint, bigint>();
+    }
+
+    loadProgram( program: number[] | bigint[] ): void
+    {
+        for ( let i = 0; i < program.length; i++ )
+        {
+            this.ram.set( BigInt( i ), BigInt( program[i] ) );
+        }
+    }
+
+    dumpRamOnly(): bigint[]
+    {
+        return Array.from( this.ram.values() ); // TODO not sure if this will always work. Write tests around this
+    }
+
+    load( address: bigint ): bigint
+    {
+        if ( !this.ram.has( address ) )
+        {
+            throw new Error( `Nonexistent address: '${address}'` );
+        }
+
+        return this.ram.get( address );
+    }
+
+    store( address: bigint, value: bigint ): void
+    {
+        this.ram.set( address, value );
     }
 }
