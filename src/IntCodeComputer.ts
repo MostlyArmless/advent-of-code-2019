@@ -43,11 +43,9 @@ export class IntCodeComputer implements IComputer
     private instructionParser: InstructionParser;
     isRunning: boolean;
 
-    constructor( memory: IMemory, stdIn: IStdIn<bigint>, stdOut: IStdOut<bigint>, enableLogging?: boolean )
+    constructor( memory: IMemory, stdIn: IStdIn<bigint>, stdOut: IStdOut<bigint>, enableLogging: boolean = false )
     {
-        if ( enableLogging != undefined )
-            this.enableLogging = enableLogging;
-
+        this.enableLogging = enableLogging;
         this.memory = memory;
         this.stdIn = stdIn;
         this.stdOut = stdOut;
