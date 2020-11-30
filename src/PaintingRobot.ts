@@ -77,7 +77,7 @@ export class PaintingRobot
     {
         this.camera.sendOutput( 0n ); // First thing we see is definitely going to be black, since the whole ship is black to start with.
 
-        this.computer.runProgram();
+        const computerPromise = this.computer.runProgram();
         if ( this.loggingLevel >= LoggingLevel.Verbose )
             this.drawStateAsText();
 
@@ -120,7 +120,7 @@ export class PaintingRobot
                     console.log( `After ${this.numMoveInstructionsProcessed + this.numPaintInstructionsProcessed} total instructions (${this.numPaintInstructionsProcessed} paints and ${this.numMoveInstructionsProcessed} moves): turn ${turnName}` );
                 }
 
-                this.camera.sendOutput( colorOfNewPosition === PaintColor.Black ? 0n : 1n );
+                this.camera.sendOutput( colorOfNewPosition === PaintColor.White ? 1n : 0n );
             }
             else
             {
@@ -130,15 +130,23 @@ export class PaintingRobot
             if ( this.loggingLevel >= LoggingLevel.Verbose )
                 this.drawStateAsText();
         }
+
+        console.log( `Robot waiting for computer to finish running...` );
+        await computerPromise;
+        console.log( `Computer finished running.` );
     }
 
-    private getColorAtCurrentPosition()
+    private getColorAtCurrentPosition(): PaintColor
     {
         const currentPositionId = this.currentPosition.getId();
-        return this.mapPanelColors.has( currentPositionId ) ? this.mapPanelColors.get( currentPositionId ) : PaintColor.Black;
+        if ( !this.mapPanelColors.has( currentPositionId ) )
+            return PaintColor.BlackUnvisited;
+
+        const colors = this.mapPanelColors.get( currentPositionId );
+        return colors[colors.length - 1];
     }
 
-    private paintCurrentPosition( paintColor: PaintColor )
+    private paintCurrentPosition( paintColor: PaintColor ): void
     {
         if ( this.mapPanelColors.has( this.currentPosition.getId() ) )
         {

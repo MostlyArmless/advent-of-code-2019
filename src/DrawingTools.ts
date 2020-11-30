@@ -16,21 +16,17 @@ const createJimp = ( width: number, height: number ) => new Promise<Jimp>( ( res
 {
     try
     {
-        console.log( `createJimp` );
         new Jimp( width, height, ( error, image ) =>
         {
             if ( error )
                 reject( error );
 
-            console.log( `createJimp resolve` );
             resolve( image );
         } );
     } catch ( error )
     {
         reject( error );
     }
-
-    console.log( `createJimp exiting` );
 } );
 
 export class Bitmap
@@ -50,14 +46,11 @@ export class Bitmap
 
     async writeToFile(): Promise<void>
     {
-        console.log( `Creating jimp image...` );
         const img: Jimp = await createJimp( this.height, this.width );
         const setPixelColor = util.promisify( img.setPixelColor );
 
-        console.log( `Setting all pixel colors...` );
         this.pixelColors.forEach( async ( color, point ) =>
         {
-            console.log( `Setting pixel color: ${point.getId()}` );
             await setPixelColor.call( img, color, point.x, point.y );
         } );
 

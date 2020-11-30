@@ -146,7 +146,7 @@ describe( 'Advent of Code Problems', () =>
         const problemInput = readFileAsBigIntArray( './src/ProblemsAndInputs/problem11input.txt' );
         const result = await measureExecutionTime( problem11a, [problemInput] );
         expect( result.runtimeSeconds ).to.be.lte( maxExpectedProblemRuntimeSeconds );
-        expect( result.functionOutput ).to.not.equal( 5279 );
+        expect( result.functionOutput ).to.equal( 2160 );
     } );
 
 } );
