@@ -74,6 +74,37 @@ export class Grid<T>
 
         return str.replace( /,/g, ' ' );;
     }
+
+    squarify(): void
+    {
+        if ( this.numRows === this.numCols )
+            return;
+
+        const fillValue = this.get( this.numRows - 1, this.numCols - 1 ); // Fill with whatever is at the bottom-right
+
+        if ( this.numRows < this.numCols )
+        {
+            // Append rows to the bottom
+            for ( let iRow = this.numRows; iRow < this.numCols; iRow++ )
+            {
+                this.grid[iRow] = Array( this.numCols ).fill( fillValue );
+            }
+        }
+        else
+        {
+            // Append columns to the right
+            const numColsToAdd = this.numRows - this.numCols;
+            for ( let iRow = 0; iRow < this.numRows; iRow++ )
+            {
+                this.grid[iRow] = this.grid[iRow].concat( Array( numColsToAdd ).fill( fillValue ) );
+            }
+            this.numCols = this.numRows;
+        }
+
+        this.numRows = this.grid.length;
+        this.numCols = this.grid[this.numRows - 1].length;
+        return;
+    }
 }
 
 export function blankGrid( numRows: number, numCols: number ): any[][]

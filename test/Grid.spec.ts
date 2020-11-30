@@ -1,7 +1,6 @@
 import { Grid } from "../src/Grid";
 import { expect } from "chai";
 
-
 describe( 'Grid', () =>
 {
     let grid: Grid<string>;
@@ -53,5 +52,29 @@ describe( 'Grid', () =>
         const gridStr = grid.toString();
         const expectedString = '0 1 2 3 4\n5 6 7 8 9\n10 11 12 13 14\n';
         expect( gridStr ).to.equal( expectedString );
+    } );
+
+    it( 'squarify wide grid', () =>
+    {
+        const wideGrid = new Grid( 3, 5, 'x' );
+        console.log( `Before:\n${wideGrid.toString()}` );
+        wideGrid.squarify();
+        console.log( `After:\n${wideGrid.toString()}` );
+        const { numRows, numCols } = wideGrid.getSize();
+
+        expect( numRows ).to.equal( numCols );
+        expect( wideGrid.get( numRows - 1, numCols - 1 ) ).to.equal( 'x' );
+    } );
+
+    it( 'squarify tall grid', () =>
+    {
+        const tallGrid = new Grid( 5, 3, 'x' );
+        console.log( `Before:\n${tallGrid.toString()}` );
+        tallGrid.squarify();
+        console.log( `After:\n${tallGrid.toString()}` );
+        const { numRows, numCols } = tallGrid.getSize();
+
+        expect( numRows ).to.equal( numCols );
+        expect( tallGrid.get( numRows - 1, numCols - 1 ) ).to.equal( 'x' );
     } );
 } );
