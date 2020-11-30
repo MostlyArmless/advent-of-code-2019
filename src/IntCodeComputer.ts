@@ -33,21 +33,17 @@ export interface IInstruction
 
 export class IntCodeComputer implements IComputer
 {
-    enableLogging: boolean = false;
-    memory: IMemory;
-    pos: bigint;
+    private enableLogging: boolean = false;
+    private memory: IMemory;
+    private pos: bigint;
+    private numInstructionsProcessed: number;
+    private stdIn: IStdIn<bigint>;
+    private stdOut: IStdOut<bigint>;
+    private relativeBase: bigint;
+    private instructionParser: InstructionParser;
     isRunning: boolean;
-    params: bigint[];
-    paramModes: ParamMode[];
-    resultAddress: bigint;
-    numInstructionsProcessed: number;
-    stdIn: IStdIn<bigint>;
-    stdOut: IStdOut<bigint>;
-    id: number;
-    relativeBase: bigint;
-    instructionParser: InstructionParser;
 
-    constructor( memory: IMemory, stdIn: IStdIn<bigint>, stdOut: IStdOut<bigint>, enableLogging?: boolean, id?: number )
+    constructor( memory: IMemory, stdIn: IStdIn<bigint>, stdOut: IStdOut<bigint>, enableLogging?: boolean )
     {
         if ( enableLogging != undefined )
             this.enableLogging = enableLogging;
@@ -56,7 +52,6 @@ export class IntCodeComputer implements IComputer
         this.stdIn = stdIn;
         this.stdOut = stdOut;
         this.reset();
-        this.id = id === undefined ? 0 : id;
     }
 
     reset(): void
@@ -64,10 +59,7 @@ export class IntCodeComputer implements IComputer
         this.memory.reset();
         this.pos = 0n;
         this.isRunning = true;
-        this.params = [null, null, null, null];
-        this.paramModes = [null, null, null, null]
         this.numInstructionsProcessed = 0;
-        this.resultAddress = null;
         this.relativeBase = 0n;
         this.instructionParser = new InstructionParser( this.memory, this.enableLogging );
     }

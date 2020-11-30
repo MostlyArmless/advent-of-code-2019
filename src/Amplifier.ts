@@ -17,7 +17,7 @@ export class Amplifier
         this.inputBuffer = inputBuffer;
         this.outputBuffer = outputBuffer;
         this.program = program;
-        this.computer = new IntCodeComputer( new Memory(), this.inputBuffer, this.outputBuffer, false, iAmp );
+        this.computer = new IntCodeComputer( new Memory(), this.inputBuffer, this.outputBuffer, false );
         this.computer.loadProgram( program );
         this.iAmp = iAmp;
     }
