@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { measureExecutionTime } from "../src/tools";
+import { measureExecutionTime, readFileAsBigIntArray } from "../src/tools";
 
 import { problem2 } from "../src/ProblemsAndInputs/problem2";
 import { problem3a, problem3b } from "../src/ProblemsAndInputs/problem3";
@@ -132,8 +132,19 @@ describe( 'Advent of Code Problems', () =>
 
     it( 'Problem 11a - PainterRobot', async () =>
     {
-        const result = await measureExecutionTime( problem11a );
+        // My input:
+        const problemInput = readFileAsBigIntArray( './src/ProblemsAndInputs/problem11input.txt' );
+        const result = await measureExecutionTime( problem11a, [problemInput] );
         expect( result.runtimeSeconds ).to.be.lte( maxExpectedProblemRuntimeSeconds );
-        expect( result.functionOutput ).to.not.equal( 5279 ); // TODO give this a real criterion. 5279 is the WRONG ANSWER, don't submit it again.
+        expect( result.functionOutput ).to.not.equal( 5279 );
+
+        // // Using someone else's inputs/outputs to test. From here:
+        // // https://github.com/romellem/advent-of-code/tree/master/2019/11
+        // const problemInput: bigint[] = readFileAsBigIntArray( './src/ProblemsAndInputs/problem11NotMyInput.txt' );
+
+        // const result = await measureExecutionTime( problem11a, [problemInput] );
+        // expect( result.runtimeSeconds ).to.be.lte( maxExpectedProblemRuntimeSeconds );
+        // expect( result.functionOutput ).to.equal( 2883 );
     } );
+
 } );

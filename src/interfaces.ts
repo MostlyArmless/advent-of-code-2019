@@ -33,3 +33,12 @@ export interface IMemory
     store( address: bigint, value: bigint ): void;
     dumpRamOnly(): bigint[];
 }
+
+export enum PaintColor
+{
+    BlackUnvisited = '.',
+    Black = 'o',
+    White = '#',
+    OriginBlack = 'B',
+    OriginWhite = 'W'
+}

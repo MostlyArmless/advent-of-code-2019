@@ -104,7 +104,6 @@ describe( 'IntCodeComputer', () =>
             const mockStdOut = new MockStdOut();
             let m_testSubject = new IntCodeComputer( new Memory(), mockInputRetriever, mockStdOut, enableLogging );
 
-            m_testSubject.enableLogging = true;
             m_testSubject.loadProgram( [3, 0, 4, 0, 99] );
             await m_testSubject.runProgram();
             expect( mockStdOut.outputs ).to.eql( [inputValue] )

@@ -1,22 +1,21 @@
-import { readFileAsBigIntArray } from "../tools";
 import { PaintingRobot } from "../PaintingRobot";
 import { IoBuffer } from "../IoBuffer";
 import { IntCodeComputer } from "../IntCodeComputer";
 import { LoggingLevel } from "../interfaces";
 import { Memory } from "../Memory";
 
-const problem11input = readFileAsBigIntArray( './src/ProblemsAndInputs/problem11input.txt' );
-
-export async function problem11a(): Promise<number>
+export async function problem11a( problemInput: bigint[] ): Promise<number>
 {
-    const camera = new IoBuffer<bigint>();
-    const nextActions = new IoBuffer<bigint>();
+    const computerBufferTimeoutMilliseconds = 2;
+    const camera = new IoBuffer<bigint>( computerBufferTimeoutMilliseconds );
+    const nextActions = new IoBuffer<bigint>( computerBufferTimeoutMilliseconds );
     const computer = new IntCodeComputer( new Memory(), camera, nextActions );
 
-    const robot = new PaintingRobot( computer, camera, nextActions, problem11input, LoggingLevel.Off );
+    const robot = new PaintingRobot( computer, camera, nextActions, problemInput, LoggingLevel.Off );
 
     await robot.paint();
-    robot.drawState( './robotPainting.txt' );
+    robot.drawStateAsText( './problem11Image.txt' );
+    robot.drawStateAsImage( './problem11Output.bmp' );
     const numPanelsPaintedAtLeastOnce = robot.getNumPanelsPaintedAtLeastOnce();
 
     const answer = numPanelsPaintedAtLeastOnce;

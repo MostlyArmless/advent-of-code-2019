@@ -5,9 +5,9 @@ export class IoBuffer<T> implements IStdIn<T>, IStdOut<T>
 {
     queue: Queue<T>;
 
-    constructor()
+    constructor( timeoutMilliseconds?: number )
     {
-        this.queue = new Queue();
+        this.queue = new Queue( timeoutMilliseconds );
     }
 
     async getInput(): Promise<T>

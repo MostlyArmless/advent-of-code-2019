@@ -1,18 +1,13 @@
 import { Coordinate } from "./Coord";
 import { Grid } from "./Grid";
 import { IoBuffer } from "./IoBuffer";
-import { IComputer, LoggingLevel } from "./interfaces";
+import { IComputer, LoggingLevel, PaintColor } from "./interfaces";
 import { translateCoords, convertRThetaPhiToXyz } from "./CoordinateTranslator";
 import * as fse from 'fs-extra';
+import { gridToBmp, PixelColor } from "./DrawingTools";
 
 type CoordinateId = string;
-type Arrow = '^' | '<' | '>' | 'v';
-enum Color
-{
-    BlackUnvisited = '.',
-    Black = 'o',
-    White = '#'
-}
+type Arrow = '^' | 'v' | '<' | '>';
 
 enum Turn
 {
@@ -28,6 +23,18 @@ interface Direction
     turnName: "left" | "right";
 }
 
+export const paintColorMap = new Map<string, PixelColor>( [
+    [PaintColor.Black, PixelColor.Black],
+    [PaintColor.BlackUnvisited, PixelColor.Black],
+    [PaintColor.White, PixelColor.White],
+    ['^', PixelColor.Red],
+    ['>', PixelColor.Red],
+    ['<', PixelColor.Red],
+    ['v', PixelColor.Red],
+    [PaintColor.OriginBlack, PixelColor.Black],
+    [PaintColor.OriginWhite, PixelColor.White]
+] );
+
 const startingPosition = new Coordinate( 0, 0 );
 
 export class PaintingRobot
@@ -35,7 +42,7 @@ export class PaintingRobot
     private camera: IoBuffer<bigint>;
     private nextActions: IoBuffer<bigint>;
     private computer: IComputer;
-    private paintedPanels: Map<CoordinateId, Color[]>;
+    private paintedPanels: Map<CoordinateId, PaintColor[]>;
     private position: Coordinate;
     private orientation: Arrow;
     private maxRadiusReached: number;
@@ -45,7 +52,7 @@ export class PaintingRobot
     private loggingLevel: LoggingLevel;
     private numUniquePaintJobsApplied: number;
 
-    constructor( computer: IComputer, camera: IoBuffer<bigint>, nextActions: IoBuffer<bigint>, program: bigint[], loggingLevel?: LoggingLevel )
+    constructor( computer: IComputer, camera: IoBuffer<bigint>, nextActions: IoBuffer<bigint>, program: bigint[], loggingLevel: LoggingLevel = LoggingLevel.Off )
     {
         this.camera = camera;
         this.nextActions = nextActions;
@@ -53,7 +60,7 @@ export class PaintingRobot
 
         this.computer.reset();
         this.computer.loadProgram( program );
-        this.paintedPanels = new Map<CoordinateId, Color[]>();
+        this.paintedPanels = new Map<CoordinateId, PaintColor[]>();
         this.maxRadiusReached = 0;
         this.thetaAtMaxRadius = 0;
         this.position = new Coordinate( 0, 0 );
@@ -64,7 +71,7 @@ export class PaintingRobot
         this.numUniquePaintJobsApplied = 0; // TODO delete me
 
         // The origin always start out black
-        this.paintedPanels.set( this.position.getId(), [Color.Black] );
+        this.paintedPanels.set( this.position.getId(), [PaintColor.Black] );
     }
 
     async paint(): Promise<void>
@@ -73,7 +80,7 @@ export class PaintingRobot
 
         this.computer.runProgram();
         if ( this.loggingLevel >= LoggingLevel.Verbose )
-            this.drawState();
+            this.drawStateAsText();
 
         let computerStillProcessing: boolean = true;
         while ( computerStillProcessing )
@@ -85,7 +92,7 @@ export class PaintingRobot
                 this.numPaintInstructionsProcessed++;
                 if ( this.loggingLevel >= LoggingLevel.Basic )
                 {
-                    const colorName = nextPaintColor === Color.Black ? "black" : "white";
+                    const colorName = nextPaintColor === PaintColor.Black ? "black" : "white";
                     console.log( `After ${this.numMoveInstructionsProcessed + this.numPaintInstructionsProcessed} total instructions (${this.numPaintInstructionsProcessed} paints and ${this.numMoveInstructionsProcessed} moves): paint ${colorName}` );
                 }
             }
@@ -114,7 +121,7 @@ export class PaintingRobot
                     console.log( `After ${this.numMoveInstructionsProcessed + this.numPaintInstructionsProcessed} total instructions (${this.numPaintInstructionsProcessed} paints and ${this.numMoveInstructionsProcessed} moves): turn ${turnName}` );
                 }
 
-                this.camera.sendOutput( colorOfNewPosition === Color.Black ? 0n : 1n );
+                this.camera.sendOutput( colorOfNewPosition === PaintColor.Black ? 0n : 1n );
             }
             else
             {
@@ -122,17 +129,17 @@ export class PaintingRobot
             }
 
             if ( this.loggingLevel >= LoggingLevel.Verbose )
-                this.drawState();
+                this.drawStateAsText();
         }
     }
 
     private getColorAtCurrentPosition()
     {
         const currentPositionId = this.position.getId();
-        return this.paintedPanels.has( currentPositionId ) ? this.paintedPanels.get( currentPositionId ) : Color.Black;
+        return this.paintedPanels.has( currentPositionId ) ? this.paintedPanels.get( currentPositionId ) : PaintColor.Black;
     }
 
-    private paintCurrentPosition( paintColor: Color )
+    private paintCurrentPosition( paintColor: PaintColor )
     {
         if ( this.paintedPanels.has( this.position.getId() ) )
         {
@@ -210,7 +217,12 @@ export class PaintingRobot
         return this.numUniquePaintJobsApplied;
     }
 
-    drawState( filename?: string ): void
+    drawStateAsImage( filename: string ): void
+    {
+        gridToBmp( filename, this.getGrid(), paintColorMap );
+    }
+
+    private getGrid(): Grid<string>
     {
         const furthestPointReached = convertRThetaPhiToXyz( this.maxRadiusReached, this.thetaAtMaxRadius );
         const minGridSize = 5;
@@ -224,7 +236,7 @@ export class PaintingRobot
         // Define (0,0) to be in the middle of the grid for human readability.
         const xGrid = Math.max( minGridSize, 2 * Math.abs( furthestPointReached.x ) + 1 );
         const yGrid = Math.max( minGridSize, 2 * Math.abs( furthestPointReached.y ) + 1 );
-        const grid = new Grid<string>( Math.abs( yGrid ) * 2, Math.abs( xGrid ) * 2, Color.BlackUnvisited );
+        const grid = new Grid<string>( Math.abs( yGrid ) * 2, Math.abs( xGrid ) * 2, PaintColor.BlackUnvisited );
 
         const originForPlottingPurposes = new Coordinate( -xGrid, -yGrid );
         const positionTranslated = translateCoords( originForPlottingPurposes, this.position );
@@ -242,11 +254,17 @@ export class PaintingRobot
 
         // Mark the origin with "B" or "W" (rather than "#" or ".") to make it visually distinct. For human readability only.
         const originColors = this.paintedPanels.get( startingPosition.getId() );
-        const mostRecentOriginColor = originColors[originColors.length - 1] === Color.Black ? 'B' : 'W';
+        const mostRecentOriginColor = originColors[originColors.length - 1] === PaintColor.Black ? PaintColor.OriginBlack : PaintColor.OriginWhite;
         grid.set( yGrid, xGrid, mostRecentOriginColor );
 
         grid.set( positionTranslated.y, positionTranslated.x, this.orientation ); // Draw after to make sure the robot always appears on top
 
+        return grid;
+    }
+
+    drawStateAsText( filename?: string ): void
+    {
+        const grid = this.getGrid();
         if ( filename )
         {
             fse.writeFileSync( filename, grid.toString( true ).replace( / /g, '' ) );
@@ -257,7 +275,7 @@ export class PaintingRobot
         }
     }
 
-    async ComputeNextPaintColor(): Promise<Color | null>
+    async ComputeNextPaintColor(): Promise<PaintColor | null>
     {
         try
         {
@@ -265,9 +283,9 @@ export class PaintingRobot
             switch ( nextInstruction )
             {
                 case 0n:
-                    return Color.Black;
+                    return PaintColor.Black;
                 case 1n:
-                    return Color.White;
+                    return PaintColor.White;
                 default:
                     throw new Error( `Computer provided invalid color: ${nextInstruction}` );
             }
@@ -286,7 +304,7 @@ export class PaintingRobot
             return this.parseDirection( Number( nextInstruction ) );
         } catch ( error )
         {
-            console.log( `Computer stopped providing outputs, no final color could be obtained` );
+            console.log( `Computer stopped providing outputs, no final direction could be obtained` );
             return null;
         }
     }

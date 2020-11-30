@@ -38,7 +38,7 @@ describe( 'PaintingRobot', () =>
 
         await robot.paint();
         const numPanelsPaintedAtLeastOnce = robot.getNumPanelsPaintedAtLeastOnce();
-        robot.drawState();
+        robot.drawStateAsText();
 
         expect( mockComputer.outputs.length ).to.equal( 0 );
         expect( numPanelsPaintedAtLeastOnce ).to.equal( 6 );
@@ -55,7 +55,7 @@ describe( 'PaintingRobot', () =>
 
         await robot.paint();
         const numPanelsPaintedAtLeastOnce = robot.getNumPanelsPaintedAtLeastOnce();
-        robot.drawState();
+        robot.drawStateAsText();
 
         expect( mockComputer.outputs.length ).to.equal( 0 );
         expect( numPanelsPaintedAtLeastOnce ).to.equal( 4 );
@@ -78,7 +78,7 @@ describe( 'PaintingRobot', () =>
 
         await robot.paint();
         const numPanelsPaintedAtLeastOnce = robot.getNumPanelsPaintedAtLeastOnce();
-        robot.drawState();
+        robot.drawStateAsText();
 
         expect( mockComputer.outputs.length ).to.equal( 0 );
         expect( numPanelsPaintedAtLeastOnce ).to.equal( 10 );
@@ -100,7 +100,7 @@ describe( 'PaintingRobot', () =>
 
         await robot.paint();
         const numPanelsPaintedAtLeastOnce = robot.getNumPanelsPaintedAtLeastOnce();
-        robot.drawState();
+        robot.drawStateAsText();
 
         expect( mockComputer.outputs.length ).to.equal( 0 );
         expect( numPanelsPaintedAtLeastOnce ).to.equal( 9 );
@@ -123,7 +123,7 @@ describe( 'PaintingRobot', () =>
 
         await robot.paint();
         const numPanelsPaintedAtLeastOnce = robot.getNumPanelsPaintedAtLeastOnce();
-        robot.drawState();
+        robot.drawStateAsText();
 
         expect( mockComputer.outputs.length ).to.equal( 0 );
         expect( numPanelsPaintedAtLeastOnce ).to.equal( 10 );
@@ -147,7 +147,7 @@ describe( 'PaintingRobot', () =>
 
         await robot.paint();
         const numPanelsPaintedAtLeastOnce = robot.getNumPanelsPaintedAtLeastOnce();
-        robot.drawState();
+        robot.drawStateAsText();
 
         expect( mockComputer.outputs.length ).to.equal( 0 );
         expect( numPanelsPaintedAtLeastOnce ).to.equal( 11 );
@@ -166,7 +166,7 @@ describe( 'PaintingRobot', () =>
 
         await robot.paint();
         const numPanelsPaintedAtLeastOnce = robot.getNumPanelsPaintedAtLeastOnce();
-        robot.drawState();
+        robot.drawStateAsText();
 
         expect( mockComputer.outputs.length ).to.equal( 0 );
         expect( numPanelsPaintedAtLeastOnce ).to.equal( 5 );
@@ -191,7 +191,7 @@ describe( 'PaintingRobot', () =>
 
         await robot.paint();
         const numPanelsPaintedAtLeastOnce = robot.getNumPanelsPaintedAtLeastOnce();
-        robot.drawState();
+        robot.drawStateAsText();
 
         expect( mockComputer.outputs.length ).to.equal( 0 );
         expect( numPanelsPaintedAtLeastOnce ).to.equal( 9 );
@@ -205,7 +205,7 @@ describe( 'PaintingRobot', () =>
 
         await robot.paint();
         const numPanelsPaintedAtLeastOnce = robot.getNumPanelsPaintedAtLeastOnce();
-        robot.drawState();
+        robot.drawStateAsText();
 
         expect( mockComputer.outputs.length ).to.equal( 0 );
         expect( numPanelsPaintedAtLeastOnce ).to.equal( 1 );
@@ -219,7 +219,7 @@ describe( 'PaintingRobot', () =>
 
         await robot.paint();
         const numPanelsPaintedAtLeastOnce = robot.getNumPanelsPaintedAtLeastOnce();
-        robot.drawState();
+        robot.drawStateAsText();
 
         expect( mockComputer.outputs.length ).to.equal( 0 );
         expect( numPanelsPaintedAtLeastOnce ).to.equal( 1 );
