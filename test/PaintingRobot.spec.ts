@@ -24,6 +24,13 @@ describe( 'PaintingRobot', () =>
         robot = new PaintingRobot( mockComputer, camera, nextActions, MockProgram, LoggingLevel.Verbose );
     } );
 
+    afterEach( function ()
+    {
+        const imageFilename = `./bitmaps/${this.currentTest.title}.bmp`;
+        console.log( `Saving image to "${imageFilename}"` );
+        robot.drawStateAsImage( imageFilename );
+    } );
+
     it( 'Sample', async () =>
     {
         mockComputer.setOutputSequence( [

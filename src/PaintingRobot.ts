@@ -1,12 +1,11 @@
-import { Coordinate } from "./Coord";
+import { calcCenterOfMass, Coordinate, idToCoord } from "./Coord";
 import { Grid } from "./Grid";
 import { IoBuffer } from "./IoBuffer";
-import { IComputer, LoggingLevel, PaintColor } from "./interfaces";
+import { CoordinateId, IComputer, LoggingLevel, PaintColor } from "./interfaces";
 import { translateCoords, convertRThetaPhiToXyz } from "./CoordinateTranslator";
 import * as fse from 'fs-extra';
-import { gridToBmp, PixelColor } from "./DrawingTools";
+import { Bitmap, PixelColor } from "./DrawingTools";
 
-type CoordinateId = string;
 type Arrow = '^' | 'v' | '<' | '>';
 
 enum Turn
@@ -23,14 +22,14 @@ interface Direction
     turnName: "left" | "right";
 }
 
-export const paintColorMap = new Map<string, PixelColor>( [
+const paintColorMap = new Map<PaintColor, PixelColor>( [
     [PaintColor.Black, PixelColor.Black],
     [PaintColor.BlackUnvisited, PixelColor.Black],
     [PaintColor.White, PixelColor.White],
-    ['^', PixelColor.Red],
-    ['>', PixelColor.Red],
-    ['<', PixelColor.Red],
-    ['v', PixelColor.Red],
+    [PaintColor.ArrowUp, PixelColor.Red],
+    [PaintColor.ArrowLeft, PixelColor.Red],
+    [PaintColor.ArrowRight, PixelColor.Red],
+    [PaintColor.ArrowDown, PixelColor.Red],
     [PaintColor.OriginBlack, PixelColor.Black],
     [PaintColor.OriginWhite, PixelColor.White]
 ] );
@@ -42,8 +41,8 @@ export class PaintingRobot
     private camera: IoBuffer<bigint>;
     private nextActions: IoBuffer<bigint>;
     private computer: IComputer;
-    private paintedPanels: Map<CoordinateId, PaintColor[]>;
-    private position: Coordinate;
+    private mapPanelColors: Map<CoordinateId, PaintColor[]>;
+    private currentPosition: Coordinate;
     private orientation: Arrow;
     private maxRadiusReached: number;
     private thetaAtMaxRadius: number;
@@ -60,10 +59,10 @@ export class PaintingRobot
 
         this.computer.reset();
         this.computer.loadProgram( program );
-        this.paintedPanels = new Map<CoordinateId, PaintColor[]>();
+        this.mapPanelColors = new Map<CoordinateId, PaintColor[]>();
         this.maxRadiusReached = 0;
         this.thetaAtMaxRadius = 0;
-        this.position = new Coordinate( 0, 0 );
+        this.currentPosition = new Coordinate( 0, 0 );
         this.orientation = '^';
         this.numMoveInstructionsProcessed = 0;
         this.numPaintInstructionsProcessed = 0;
@@ -71,7 +70,7 @@ export class PaintingRobot
         this.numUniquePaintJobsApplied = 0; // TODO delete me
 
         // The origin always start out black
-        this.paintedPanels.set( this.position.getId(), [PaintColor.Black] );
+        this.mapPanelColors.set( this.currentPosition.getId(), [PaintColor.Black] );
     }
 
     async paint(): Promise<void>
@@ -105,15 +104,15 @@ export class PaintingRobot
             if ( nextDirection !== null )
             {
                 const { dx, dy, newOrientation, turnName } = nextDirection;
-                this.position.move( dx, dy ); // Move to the new spot
+                this.currentPosition.move( dx, dy ); // Move to the new spot
                 this.numMoveInstructionsProcessed++;
                 this.orientation = newOrientation;
                 const colorOfNewPosition = this.getColorAtCurrentPosition(); // Read the new color
 
-                if ( this.position.r > this.maxRadiusReached )
+                if ( this.currentPosition.r > this.maxRadiusReached )
                 {
-                    this.maxRadiusReached = this.position.r;
-                    this.thetaAtMaxRadius = this.position.theta;
+                    this.maxRadiusReached = this.currentPosition.r;
+                    this.thetaAtMaxRadius = this.currentPosition.theta;
                 }
 
                 if ( this.loggingLevel >= LoggingLevel.Basic )
@@ -135,16 +134,16 @@ export class PaintingRobot
 
     private getColorAtCurrentPosition()
     {
-        const currentPositionId = this.position.getId();
-        return this.paintedPanels.has( currentPositionId ) ? this.paintedPanels.get( currentPositionId ) : PaintColor.Black;
+        const currentPositionId = this.currentPosition.getId();
+        return this.mapPanelColors.has( currentPositionId ) ? this.mapPanelColors.get( currentPositionId ) : PaintColor.Black;
     }
 
     private paintCurrentPosition( paintColor: PaintColor )
     {
-        if ( this.paintedPanels.has( this.position.getId() ) )
+        if ( this.mapPanelColors.has( this.currentPosition.getId() ) )
         {
             // We've been here before
-            let colorsOnThisSquareSoFar = this.paintedPanels.get( this.position.getId() );
+            let colorsOnThisSquareSoFar = this.mapPanelColors.get( this.currentPosition.getId() );
             const currentColorOfThisSquare = colorsOnThisSquareSoFar[colorsOnThisSquareSoFar.length - 1];
 
             if ( paintColor !== currentColorOfThisSquare )
@@ -153,13 +152,13 @@ export class PaintingRobot
             }
 
             colorsOnThisSquareSoFar.push( paintColor );
-            this.paintedPanels.set( this.position.getId(), colorsOnThisSquareSoFar );
+            this.mapPanelColors.set( this.currentPosition.getId(), colorsOnThisSquareSoFar );
         }
         else
         {
             // We've never been here before
             this.numUniquePaintJobsApplied++;
-            this.paintedPanels.set( this.position.getId(), [paintColor] );
+            this.mapPanelColors.set( this.currentPosition.getId(), [paintColor] );
         }
     }
 
@@ -209,7 +208,7 @@ export class PaintingRobot
 
     getNumPanelsPaintedAtLeastOnce(): number
     {
-        return this.paintedPanels.size
+        return this.mapPanelColors.size
     }
 
     getNumUniquePaintsApplied(): number
@@ -217,9 +216,55 @@ export class PaintingRobot
         return this.numUniquePaintJobsApplied;
     }
 
-    drawStateAsImage( filename: string ): void
+    async drawStateAsImage( filename: string ): Promise<void>
     {
-        gridToBmp( filename, this.getGrid(), paintColorMap );
+        // Directly create the bitmap without using a grid first
+        let points: Coordinate[] = [];
+        this.mapPanelColors.forEach( ( colors, coordId ) =>
+        {
+            if ( coordId === startingPosition.getId() )
+                return;
+
+            points.push( idToCoord( coordId ) );
+        } );
+        const centerOfMass = calcCenterOfMass( points, true );
+
+        // Define (0,0) to be in the middle of the grid for human readability.
+        const minGridSize = 2;
+        const width = Math.max( minGridSize, 2 * ( Math.ceil( this.maxRadiusReached ) + 1 ) );
+        const height = width;
+
+        const originForPlottingPurposes = new Coordinate( -( width / 2 ), -( height / 2 ) );
+
+        function translatePointForDrawing( point: Coordinate ): Coordinate
+        {
+            return translateCoords( originForPlottingPurposes, translateCoords( centerOfMass, point ) );
+        }
+
+        // Convert paint colors to pixel colors
+        const pixelColors: Map<Coordinate, PixelColor> = new Map<Coordinate, PixelColor>();
+        this.mapPanelColors.forEach( ( colors, coordId ) =>
+        {
+            const pixelColor = paintColorMap.get( colors[colors.length - 1] );
+            const rawCoord = idToCoord( coordId );
+            const pointTranslated: Coordinate = translatePointForDrawing( rawCoord );
+            if ( pointTranslated.x < 0 || pointTranslated.x > width || pointTranslated.y < 0 || pointTranslated.y > height )
+                throw new Error( "PointTranslater is outside the image grid" );
+            pixelColors.set( pointTranslated, pixelColor );
+        } );
+
+        if ( pixelColors.size !== this.mapPanelColors.size )
+            throw new Error( `Different number of pixelColors (${pixelColors.size}) and paintColors (${this.mapPanelColors.size})` );
+
+
+        pixelColors.set( translatePointForDrawing( this.currentPosition ), PixelColor.Red );
+
+        const originColors = this.mapPanelColors.get( startingPosition.getId() );
+        const originColor = originColors[originColors.length - 1] === PaintColor.White ? PixelColor.Green : PixelColor.Blue;
+        pixelColors.set( translatePointForDrawing( startingPosition ), originColor );
+
+        const bmp = new Bitmap( filename, height, width, pixelColors );
+        await bmp.writeToFile();
     }
 
     private getGrid(): Grid<string>
@@ -228,7 +273,7 @@ export class PaintingRobot
         const minGridSize = 5;
         if ( this.loggingLevel >= LoggingLevel.Verbose )
         {
-            console.log( `Position = ${this.position.getId()}` );
+            console.log( `Position = ${this.currentPosition.getId()}` );
             console.log( `Furthest point reached: rtheta = (${this.maxRadiusReached},${this.thetaAtMaxRadius}), xy = (${furthestPointReached.x},${furthestPointReached.y})` );
             console.log( `Painted ${this.getNumPanelsPaintedAtLeastOnce()} unique panels, including starting position` );
         }
@@ -239,21 +284,18 @@ export class PaintingRobot
         const grid = new Grid<string>( Math.abs( yGrid ) * 2, Math.abs( xGrid ) * 2, PaintColor.BlackUnvisited );
 
         const originForPlottingPurposes = new Coordinate( -xGrid, -yGrid );
-        const positionTranslated = translateCoords( originForPlottingPurposes, this.position );
+        const positionTranslated = translateCoords( originForPlottingPurposes, this.currentPosition );
 
-        this.paintedPanels.forEach( ( colors, coordinateId ) =>
+        this.mapPanelColors.forEach( ( colors, coordinateId ) =>
         {
-            const xy = coordinateId.split( ',' );
-            const x = parseInt( xy[0] );
-            const y = parseInt( xy[1] );
-            const color = colors[colors.length - 1]; // Take the topmost (most recent) color
-            const point = new Coordinate( x, y );
-            const pointTranslated = translateCoords( originForPlottingPurposes, point );
+            const color: PaintColor = colors[colors.length - 1]; // Take the topmost (most recent) color
+            const point: Coordinate = idToCoord( coordinateId );
+            const pointTranslated: Coordinate = translateCoords( originForPlottingPurposes, point );
             grid.set( pointTranslated.y, pointTranslated.x, color );
         } );
 
         // Mark the origin with "B" or "W" (rather than "#" or ".") to make it visually distinct. For human readability only.
-        const originColors = this.paintedPanels.get( startingPosition.getId() );
+        const originColors = this.mapPanelColors.get( startingPosition.getId() );
         const mostRecentOriginColor = originColors[originColors.length - 1] === PaintColor.Black ? PaintColor.OriginBlack : PaintColor.OriginWhite;
         grid.set( yGrid, xGrid, mostRecentOriginColor );
 

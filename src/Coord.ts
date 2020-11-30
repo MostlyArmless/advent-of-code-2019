@@ -17,12 +17,12 @@ export class Coordinate
         this.x = x;
         this.y = y;
         this.z = z;
-        this.updatePolarCoordsAndId( this.x, this.y, this.z );
+        this.updatePolarCoordsAndId();
     }
 
-    private updatePolarCoordsAndId( x: number, y: number, z: number = 0 )
+    updatePolarCoordsAndId()
     {
-        const { r, theta, phi } = convertXyzToRThetaPhi( x, y, z );
+        const { r, theta, phi } = convertXyzToRThetaPhi( this.x, this.y, this.z );
         this.r = r;
         this.theta = theta;
         this.phi = phi;
@@ -40,7 +40,58 @@ export class Coordinate
         this.x += dx;
         this.y += dy;
         this.z += dz;
-
-        this.updatePolarCoordsAndId( this.x, this.y, this.z );
+        this.updatePolarCoordsAndId();
     }
+
+    add( vector: Coordinate ): void
+    {
+        this.x += vector.x;
+        this.y += vector.y;
+        this.z += vector.z;
+        this.updatePolarCoordsAndId();
+    }
+
+    scale( scalingFactor: number ): void
+    {
+        this.x *= scalingFactor;
+        this.y *= scalingFactor;
+        this.z *= scalingFactor;
+        this.updatePolarCoordsAndId();
+    }
+}
+
+export function idToCoord( id: string ): Coordinate
+{
+    const coords: number[] = id.split( ',' ).map( e => parseInt( e ) );
+    if ( coords.length === 3 )
+        return new Coordinate( coords[0], coords[1], coords[2] );
+    else if ( coords.length === 2 )
+        return new Coordinate( coords[0], coords[1] );
+    else
+        throw new Error( 'Invalid ID supplied to idToCoord' );
+}
+
+export function calcVectorSum( coords: Coordinate[] ): Coordinate
+{
+    let sum = new Coordinate( coords[0].x, coords[0].y, coords[0].z );
+
+    for ( let i = 1; i < coords.length; i++ )
+    {
+        sum.add( coords[i] );
+    }
+    return sum;
+}
+
+export function calcCenterOfMass( coords: Coordinate[], round: boolean = false ): Coordinate
+{
+    let sum = calcVectorSum( coords );
+    sum.scale( 1 / coords.length );
+    if ( round )
+    {
+        sum.x = Math.round( sum.x );
+        sum.y = Math.round( sum.y );
+        sum.z = Math.round( sum.z );
+        sum.updatePolarCoordsAndId();
+    }
+    return sum
 }

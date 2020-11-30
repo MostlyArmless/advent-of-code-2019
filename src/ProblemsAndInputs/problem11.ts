@@ -14,8 +14,7 @@ export async function problem11a( problemInput: bigint[] ): Promise<number>
     const robot = new PaintingRobot( computer, camera, nextActions, problemInput, LoggingLevel.Off );
 
     await robot.paint();
-    robot.drawStateAsText( './problem11Image.txt' );
-    robot.drawStateAsImage( './problem11Output.bmp' );
+    await robot.drawStateAsImage( './bitmaps/problem11a_output.bmp' );
     const numPanelsPaintedAtLeastOnce = robot.getNumPanelsPaintedAtLeastOnce();
 
     const answer = numPanelsPaintedAtLeastOnce;

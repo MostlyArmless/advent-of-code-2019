@@ -1,5 +1,6 @@
 import * as Jimp from 'jimp';
-import { Grid } from './Grid';
+import { Coordinate } from './Coord';
+import * as util from 'util';
 
 export enum PixelColor
 {
@@ -11,28 +12,59 @@ export enum PixelColor
     Transparent = 0x00000000
 }
 
-export function gridToBmp( filename: string, grid: Grid<string>, colorMap: Map<string, PixelColor> ): void
+const createJimp = ( width: number, height: number ) => new Promise<Jimp>( ( resolve, reject ) =>
 {
-    const { numRows, numCols } = grid.getSize();
-
-    const jmp = new Jimp( numRows, numCols, ( err, img ) =>
+    try
     {
-        if ( err ) throw err;
-
-        const { numRows, numCols } = grid.getSize();
-        for ( let iRow = 0; iRow < numRows; iRow++ )
+        console.log( `createJimp` );
+        new Jimp( width, height, ( error, image ) =>
         {
-            for ( let iCol = 0; iCol < numCols; iCol++ )
-            {
-                const strElem = grid.get( iRow, iCol );
-                const color = colorMap.has( strElem ) ? colorMap.get( strElem ) : PixelColor.Green;
-                img.setPixelColor( color, iCol, iRow );
-            }
-        }
+            if ( error )
+                reject( error );
 
-        img.flip( false, true );
-        img.write( filename );
-    } );
+            console.log( `createJimp resolve` );
+            resolve( image );
+        } );
+    } catch ( error )
+    {
+        reject( error );
+    }
 
-    console.log( jmp );
+    console.log( `createJimp exiting` );
+} );
+
+export class Bitmap
+{
+    private filename: string;
+    private height: number;
+    private width: number;
+    private pixelColors: Map<Coordinate, PixelColor>;
+
+    constructor( filename: string, height: number, width: number, pixelColors: Map<Coordinate, PixelColor> )
+    {
+        this.filename = filename;
+        this.height = height;
+        this.width = width;
+        this.pixelColors = pixelColors;
+    }
+
+    async writeToFile(): Promise<void>
+    {
+        console.log( `Creating jimp image...` );
+        const img: Jimp = await createJimp( this.height, this.width );
+        const setPixelColor = util.promisify( img.setPixelColor );
+
+        console.log( `Setting all pixel colors...` );
+        this.pixelColors.forEach( async ( color, point ) =>
+        {
+            console.log( `Setting pixel color: ${point.getId()}` );
+            await setPixelColor.call( img, color, point.x, point.y );
+        } );
+
+        const flipImage = util.promisify( img.flip );
+        await flipImage.call( img, false, true );
+        console.log( `Writing bitmap to file: '${this.filename}'` );
+        await img.writeAsync( this.filename );
+        console.log( `Done writing bitmap to file.` );
+    }
 }

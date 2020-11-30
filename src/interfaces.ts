@@ -40,5 +40,11 @@ export enum PaintColor
     Black = 'o',
     White = '#',
     OriginBlack = 'B',
-    OriginWhite = 'W'
+    OriginWhite = 'W',
+    ArrowUp = '^',
+    ArrowLeft = '<',
+    ArrowRight = '>',
+    ArrowDown = 'v'
 }
+
+export type CoordinateId = string;

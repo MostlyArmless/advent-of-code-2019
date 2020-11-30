@@ -130,21 +130,23 @@ describe( 'Advent of Code Problems', () =>
         expect( result.functionOutput ).to.deep.equal( 1623 );
     } );
 
-    it( 'Problem 11a - PainterRobot', async () =>
+    it( "Problem 11a - PainterRobot - Someone else's input data", async () =>
+    {
+        console.log( `Testing Problem 11a using someone else's data, obtained from here:\nhttps://github.com/romellem/advent-of-code/tree/master/2019/11` );
+        const problemInput: bigint[] = readFileAsBigIntArray( './src/ProblemsAndInputs/problem11NotMyInput.txt' );
+
+        const result = await measureExecutionTime( problem11a, [problemInput] );
+        expect( result.runtimeSeconds ).to.be.lte( maxExpectedProblemRuntimeSeconds );
+        expect( result.functionOutput ).to.equal( 2883 );
+    } );
+
+    it( 'Problem 11a - PainterRobot - My input data', async () =>
     {
         // My input:
         const problemInput = readFileAsBigIntArray( './src/ProblemsAndInputs/problem11input.txt' );
         const result = await measureExecutionTime( problem11a, [problemInput] );
         expect( result.runtimeSeconds ).to.be.lte( maxExpectedProblemRuntimeSeconds );
         expect( result.functionOutput ).to.not.equal( 5279 );
-
-        // // Using someone else's inputs/outputs to test. From here:
-        // // https://github.com/romellem/advent-of-code/tree/master/2019/11
-        // const problemInput: bigint[] = readFileAsBigIntArray( './src/ProblemsAndInputs/problem11NotMyInput.txt' );
-
-        // const result = await measureExecutionTime( problem11a, [problemInput] );
-        // expect( result.runtimeSeconds ).to.be.lte( maxExpectedProblemRuntimeSeconds );
-        // expect( result.functionOutput ).to.equal( 2883 );
     } );
 
 } );
