@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { Memory, MapMemory } from "../../src/Memory";
 import { problem2 } from "../../src/ProblemsAndInputs/problem2";
-import { measureExecutionTime } from "../../src/tools";
+import { measureExecutionTime } from 'func-timer';
 
 // This test won't show up in the TestExplorer. To run it, make sure you build first then run:
 // mocha .\build\test\performance\Memory.perf.js

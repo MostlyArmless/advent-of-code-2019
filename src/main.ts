@@ -3,7 +3,8 @@
 // CLI syntax example to run problem 2
 // npm start -- 3
 import * as path from 'path';
-import { measureExecutionTime, readFileAsBigIntArray } from "./tools";
+import { readFileAsBigIntArray } from "./tools";
+import { measureExecutionTime } from 'func-timer';
 
 let problemNumber = parseInt( process.argv[2] );
 // let problemNumber = 11; // Uncomment this line instead of the line above in order to run from the debugger. Or pass the args via launch.json.

@@ -1,5 +1,6 @@
 import { expect } from "chai";
-import { measureExecutionTime, readFileAsBigIntArray } from "../src/tools";
+import { measureExecutionTime } from 'func-timer';
+import { readFileAsBigIntArray } from "../src/tools";
 
 import { problem2 } from "../src/ProblemsAndInputs/problem2";
 import { problem3a, problem3b } from "../src/ProblemsAndInputs/problem3";
