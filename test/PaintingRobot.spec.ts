@@ -4,7 +4,7 @@ import { IoBuffer } from "../src/IoBuffer";
 import { PaintingRobot } from "../src/PaintingRobot";
 import { MockComputer } from "../src/Mocks/MockComputer";
 import { MockProgram } from "../src/Mocks/Mocks";
-import { LoggingLevel } from "../src/interfaces";
+import { LoggingLevel, PaintColor } from "../src/interfaces";
 
 describe( 'PaintingRobot', () =>
 {
@@ -43,7 +43,7 @@ describe( 'PaintingRobot', () =>
             1n, 0n // white, left
         ] );
 
-        await robot.paint();
+        await robot.paint( PaintColor.Black );
         const numPanelsPaintedAtLeastOnce = robot.getNumPanelsPaintedAtLeastOnce();
         robot.drawStateAsText();
 
@@ -60,7 +60,7 @@ describe( 'PaintingRobot', () =>
             1n,     // white
         ] );
 
-        await robot.paint();
+        await robot.paint( PaintColor.Black );
         const numPanelsPaintedAtLeastOnce = robot.getNumPanelsPaintedAtLeastOnce();
         robot.drawStateAsText();
 
@@ -83,7 +83,7 @@ describe( 'PaintingRobot', () =>
             1n, 0n, // white, left
         ] );
 
-        await robot.paint();
+        await robot.paint( PaintColor.Black );
         const numPanelsPaintedAtLeastOnce = robot.getNumPanelsPaintedAtLeastOnce();
         robot.drawStateAsText();
 
@@ -105,7 +105,7 @@ describe( 'PaintingRobot', () =>
             1n, 0n, // white, left
         ] );
 
-        await robot.paint();
+        await robot.paint( PaintColor.Black );
         const numPanelsPaintedAtLeastOnce = robot.getNumPanelsPaintedAtLeastOnce();
         robot.drawStateAsText();
 
@@ -128,7 +128,7 @@ describe( 'PaintingRobot', () =>
             1n, 0n, // white, left
         ] );
 
-        await robot.paint();
+        await robot.paint( PaintColor.Black );
         const numPanelsPaintedAtLeastOnce = robot.getNumPanelsPaintedAtLeastOnce();
         robot.drawStateAsText();
 
@@ -152,7 +152,7 @@ describe( 'PaintingRobot', () =>
             1n, 0n, // white, left
         ] );
 
-        await robot.paint();
+        await robot.paint( PaintColor.Black );
         const numPanelsPaintedAtLeastOnce = robot.getNumPanelsPaintedAtLeastOnce();
         robot.drawStateAsText();
 
@@ -171,7 +171,7 @@ describe( 'PaintingRobot', () =>
             1n, 1n, // white, right
         ] );
 
-        await robot.paint();
+        await robot.paint( PaintColor.Black );
         const numPanelsPaintedAtLeastOnce = robot.getNumPanelsPaintedAtLeastOnce();
         robot.drawStateAsText();
 
@@ -196,7 +196,7 @@ describe( 'PaintingRobot', () =>
             0n, 1n, // black, right
         ] );
 
-        await robot.paint();
+        await robot.paint( PaintColor.Black );
         const numPanelsPaintedAtLeastOnce = robot.getNumPanelsPaintedAtLeastOnce();
         robot.drawStateAsText();
 
@@ -210,7 +210,7 @@ describe( 'PaintingRobot', () =>
             1n, 1n, // white, right
         ] );
 
-        await robot.paint();
+        await robot.paint( PaintColor.Black );
         const numPanelsPaintedAtLeastOnce = robot.getNumPanelsPaintedAtLeastOnce();
         robot.drawStateAsText();
 
@@ -224,7 +224,7 @@ describe( 'PaintingRobot', () =>
             1n, 0n, // white, left
         ] );
 
-        await robot.paint();
+        await robot.paint( PaintColor.Black );
         const numPanelsPaintedAtLeastOnce = robot.getNumPanelsPaintedAtLeastOnce();
         robot.drawStateAsText();
 

@@ -10,7 +10,7 @@ import { problem7a, problem7b } from "../src/ProblemsAndInputs/problem7";
 import { problem8a } from "../src/ProblemsAndInputs/problem8";
 import { problem9a, problem9b } from "../src/ProblemsAndInputs/problem9";
 import { problem10a, problem10b } from "../src/ProblemsAndInputs/problem10";
-import { problem11a } from "../src/ProblemsAndInputs/problem11";
+import { problem11a, problem11b } from "../src/ProblemsAndInputs/problem11";
 import { Memory } from "../src/Memory";
 
 const maxExpectedProblemRuntimeSeconds = 1.5;
@@ -142,11 +142,16 @@ describe( 'Advent of Code Problems', () =>
 
     it( 'Problem 11a - PainterRobot - My input data', async () =>
     {
-        // My input:
         const problemInput = readFileAsBigIntArray( './src/ProblemsAndInputs/problem11input.txt' );
         const result = await measureExecutionTime( problem11a, [problemInput] );
         expect( result.runtimeSeconds ).to.be.lte( maxExpectedProblemRuntimeSeconds );
         expect( result.functionOutput ).to.equal( 2160 );
     } );
 
+    it( 'Problem 11b - PainterRobot', async () =>
+    {
+        const problemInput = readFileAsBigIntArray( './src/ProblemsAndInputs/problem11input.txt' );
+        const result = await measureExecutionTime( problem11b, [problemInput] );
+        expect( result.runtimeSeconds ).to.be.lte( maxExpectedProblemRuntimeSeconds );
+    } );
 } );

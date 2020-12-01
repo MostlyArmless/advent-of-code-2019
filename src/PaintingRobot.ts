@@ -73,9 +73,9 @@ export class PaintingRobot
         this.mapPanelColors.set( this.currentPosition.getId(), [PaintColor.Black] );
     }
 
-    async paint(): Promise<void>
+    async paint( startingPanelColor: PaintColor.Black | PaintColor.White ): Promise<void>
     {
-        this.camera.sendOutput( 0n ); // First thing we see is definitely going to be black, since the whole ship is black to start with.
+        this.camera.sendOutput( startingPanelColor === PaintColor.White ? 1n : 0n );
 
         const computerPromise = this.computer.runProgram();
         if ( this.loggingLevel >= LoggingLevel.Verbose )
