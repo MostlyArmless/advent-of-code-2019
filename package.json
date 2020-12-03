@@ -33,7 +33,7 @@
     "chai-almost": "^1.0.1",
     "chai-as-promised": "^7.1.1",
     "chai-string": "^1.5.0",
-    "func-timer": "^0.1.2",
+    "func-timer": "^0.1.4",
     "mocha": "^5.2.0",
     "nyc": "^15.1.0",
     "shuffle-array": "^1.0.1",
