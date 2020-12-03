@@ -58,6 +58,11 @@ export class Coordinate
         this.z *= scalingFactor;
         this.updatePolarCoordsAndId();
     }
+
+    calcSumAbs( nDimensions: 2 | 3 = 3 ): number
+    {
+        return Math.abs( this.x ) + Math.abs( this.y ) + ( nDimensions === 3 ? Math.abs( this.z ) : 0 );
+    }
 }
 
 export function idToCoord( id: string ): Coordinate
